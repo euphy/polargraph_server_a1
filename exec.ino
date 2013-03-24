@@ -61,6 +61,8 @@ boolean exec_executeBasicCommand(String &com)
     exec_setMachineStepsPerRevFromCommand();
   else if (com.startsWith(CMD_SETMACHINESTEPMULTIPLIER))
     exec_setMachineStepMultiplierFromCommand();
+  else if (com.startsWith(CMD_SETPENLIFTRANGE))
+    exec_setPenLiftRange();
   else if (com.startsWith(CMD_GETMACHINEDETAILS))
     exec_reportMachineSpec();
   else if (com.startsWith(CMD_RESETEEPROM))
@@ -113,17 +115,25 @@ void exec_setMachineSizeFromCommand()
 {
   int width = asInt(inParam1);
   int height = asInt(inParam2);
-  
-  if (width > 10)
-  {
-    eeprom_EEPROMWriteInt(EEPROM_MACHINE_WIDTH, width);
-  }
-  if (height > 10)
-  {
-    eeprom_EEPROMWriteInt(EEPROM_MACHINE_HEIGHT, height);
-  }
 
-  eeprom_loadMachineSpecFromEeprom();
+  // load to get current settings
+  int currentValue = width;
+  EEPROM_readAnything(EEPROM_MACHINE_WIDTH, currentValue);  
+  if (currentValue != width)
+    if (width > 10)
+    {
+      EEPROM_writeAnything(EEPROM_MACHINE_WIDTH, width);
+    }
+  
+  EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, currentValue);
+  if (currentValue != height)
+    if (height > 10)
+    {
+      EEPROM_writeAnything(EEPROM_MACHINE_HEIGHT, height);
+    }
+
+  // reload 
+  eeprom_loadMachineSize();
 }
 void exec_setMachineNameFromCommand()
 {
@@ -141,20 +151,27 @@ void exec_setMachineNameFromCommand()
 void exec_setMachineMmPerRevFromCommand()
 {
   float mmPerRev = asFloat(inParam1);
-  eeprom_EEPROMWriteInt(EEPROM_MACHINE_MM_PER_REV, mmPerRev);
+  EEPROM_writeAnything(EEPROM_MACHINE_MM_PER_REV, mmPerRev);
   eeprom_loadMachineSpecFromEeprom();
 }
 void exec_setMachineStepsPerRevFromCommand()
 {
   int stepsPerRev = asInt(inParam1);
-  eeprom_EEPROMWriteInt(EEPROM_MACHINE_STEPS_PER_REV, stepsPerRev);
+  EEPROM_writeAnything(EEPROM_MACHINE_STEPS_PER_REV, stepsPerRev);
   eeprom_loadMachineSpecFromEeprom();
 }
-
 void exec_setMachineStepMultiplierFromCommand()
 {
-  eeprom_EEPROMWriteInt(EEPROM_MACHINE_STEP_MULTIPLIER, asInt(inParam1));
+  EEPROM_writeAnything(EEPROM_MACHINE_STEP_MULTIPLIER, asInt(inParam1));
   eeprom_loadMachineSpecFromEeprom();
+}
+void exec_setPenLiftRange()
+{
+  int down = asInt(inParam1);
+  int up = asInt(inParam2);
+  EEPROM_writeAnything(EEPROM_PENLIFT_DOWN, down);
+  EEPROM_writeAnything(EEPROM_PENLIFT_UP, up);
+  eeprom_loadPenLiftRange();
 }
 
 void exec_setMotorSpeed()

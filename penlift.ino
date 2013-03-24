@@ -14,6 +14,10 @@ the page.
 */
 void penlift_penUp()
 {
+  if (inNoOfParams > 1)
+  {
+    upPosition = asInt(inParam1);
+  }
   if (isPenUp == false)
   {
     penlift_movePenUp();
@@ -23,10 +27,9 @@ void penlift_penUp()
 void penlift_movePenUp()
 {
   penHeight.attach(PEN_HEIGHT_SERVO_PIN);
-  for (int i=DOWN_POSITION; i<UP_POSITION; i++) {
-//    Serial.println(i);
+  for (int i=downPosition; i<upPosition; i++) {
     penHeight.write(i);
-    delay(10);
+    delay(penLiftSpeed);
   }
   penHeight.detach();
   isPenUp = true;
@@ -35,6 +38,12 @@ void penlift_movePenUp()
 
 void penlift_penDown()
 {
+  // check to see if this is a multi-action command (if there's a
+  // parameter then this sets the "down" motor position too).
+  if (inNoOfParams > 1)
+  {
+    downPosition = asInt(inParam1);
+  }
   if (isPenUp == true)
   {
     penlift_movePenDown();
@@ -43,10 +52,10 @@ void penlift_penDown()
 void penlift_movePenDown()
 {
   penHeight.attach(PEN_HEIGHT_SERVO_PIN);
-  for (int i=UP_POSITION; i>DOWN_POSITION; i--) {
+  for (int i=upPosition; i>downPosition; i--) {
 //    Serial.println(i);
     penHeight.write(i);
-    delay(5);
+    delay(penLiftSpeed);
   }
   penHeight.detach();
   isPenUp = false;

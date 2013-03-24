@@ -16,9 +16,10 @@ used to retrieve the machines saved values when it restarts, or
 whenever a value is written to the EEPROM.
 
 */
+
 void eeprom_resetEeprom()
 {
-  for (int i = 0; i <20; i++)
+  for (int i = 0; i <50; i++)
   {
     EEPROM.write(i, 0);
   }
@@ -34,12 +35,9 @@ void eeprom_dumpEeprom()
   }
 }  
 
-
-void eeprom_loadMachineSpecFromEeprom()
+void eeprom_loadMachineSize()
 {
-  impl_loadMachineSpecFromEeprom();
-
-  machineWidth = eeprom_EEPROMReadInt(EEPROM_MACHINE_WIDTH);
+  EEPROM_readAnything(EEPROM_MACHINE_WIDTH, machineWidth);
   if (machineWidth < 1)
   {
     machineWidth = defaultMachineWidth;
@@ -47,15 +45,18 @@ void eeprom_loadMachineSpecFromEeprom()
   Serial.print(F("Loaded machine width:"));
   Serial.println(machineWidth);
   
-  machineHeight = eeprom_EEPROMReadInt(EEPROM_MACHINE_HEIGHT);
+  EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, machineHeight);
   if (machineHeight < 1)
   {
     machineHeight = defaultMachineHeight;
   }
   Serial.print(F("Loaded machine height:"));
   Serial.println(machineHeight);
+}
 
-  mmPerRev = eeprom_EEPROMReadInt(EEPROM_MACHINE_MM_PER_REV);
+void eeprom_loadSpoolSpec()
+{
+  EEPROM_readAnything(EEPROM_MACHINE_MM_PER_REV, mmPerRev);
   if (mmPerRev < 1)
   {
     mmPerRev = defaultMmPerRev;
@@ -63,14 +64,36 @@ void eeprom_loadMachineSpecFromEeprom()
   Serial.print(F("Loaded mm per rev:"));
   Serial.println(mmPerRev);
 
-  motorStepsPerRev = eeprom_EEPROMReadInt(EEPROM_MACHINE_STEPS_PER_REV);
+  EEPROM_readAnything(EEPROM_MACHINE_STEPS_PER_REV, motorStepsPerRev);
   if (motorStepsPerRev < 1)
   {
     motorStepsPerRev = defaultStepsPerRev;
   }
   Serial.print(F("Loaded motor steps per rev:"));
   Serial.println(motorStepsPerRev);
+}  
 
+void eeprom_loadPenLiftRange()
+{
+  EEPROM_readAnything(EEPROM_PENLIFT_DOWN, downPosition);
+  if (downPosition < 1)
+  {
+    downPosition = DEFAULT_DOWN_POSITION;
+  }
+  Serial.print(F("Loaded down pos:"));
+  Serial.println(downPosition);
+
+  EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
+  if (upPosition < 1)
+  {
+    upPosition = DEFAULT_UP_POSITION;
+  }
+  Serial.print(F("Loaded up pos:"));
+  Serial.println(upPosition);
+}  
+
+void eeprom_loadMachineName()
+{
   String name = "";
   for (int i = 0; i < 8; i++)
   {
@@ -84,58 +107,107 @@ void eeprom_loadMachineSpecFromEeprom()
   machineName = name;
   Serial.print(F("Loaded machine name:"));
   Serial.println(machineName);
-  
-  stepMultiplier = eeprom_EEPROMReadInt(EEPROM_MACHINE_STEP_MULTIPLIER);
+}
+
+void eeprom_loadStepMultiplier()
+{
+  EEPROM_readAnything(EEPROM_MACHINE_STEP_MULTIPLIER, stepMultiplier);
   if (stepMultiplier < 1)
   {
     stepMultiplier = defaultStepMultiplier;
   }
   Serial.print(F("Loaded motor step multiplier:"));
   Serial.println(stepMultiplier);  
+}  
+
+void eeprom_loadMachineSpecFromEeprom()
+{
+  impl_loadMachineSpecFromEeprom();
+
+  eeprom_loadMachineSize();
+  eeprom_loadSpoolSpec();
+  eeprom_loadStepMultiplier();
+  eeprom_loadMachineName();
+  eeprom_loadPenLiftRange();
+
+  
+  // load speed, acceleration
+  EEPROM_readAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
+  if (currentMaxSpeed < 1)
+    currentMaxSpeed = 800.0;
+    
+  EEPROM_readAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
+  if (currentAcceleration < 1)
+    currentAcceleration = 800.0;
+    
+  // load penwidth
+  EEPROM_readAnything(EEPROM_MACHINE_PEN_WIDTH, penWidth);
+  if (penWidth < 0.0001)
+    penWidth = 0.8;
+  
 
   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
   
-  Serial.print(F("Recalculated mmPerStep ("));
+  Serial.print(F("Recalc mmPerStep ("));
   Serial.print(mmPerStep);
-  Serial.print(F(") and stepsPerMM ("));
+  Serial.print(F("), stepsPerMM ("));
   Serial.print(stepsPerMM);
   Serial.print(F(")"));
   Serial.println();
 
   pageWidth = machineWidth * stepsPerMM;
-  Serial.print(F("Recalculated pageWidth in steps ("));
+  Serial.print(F("Recalc pageWidth in steps ("));
   Serial.print(pageWidth);
   Serial.print(F(")"));
   Serial.println();
   pageHeight = machineHeight * stepsPerMM;
-  Serial.print(F("Recalculated pageHeight in steps ("));
+  Serial.print(F("Recalc pageHeight in steps ("));
   Serial.print(pageHeight);
   Serial.print(F(")"));
   Serial.println();
 
   maxLength = 0;
 }
-
-//This function will write a 2 byte integer to the eeprom at the specified address and address + 1
-void eeprom_EEPROMWriteInt(int p_address, int p_value)
-{
-  Serial.print(F("Writing Int "));
-  Serial.print(p_value);
-  Serial.print(F(" to address "));
-  Serial.println(p_address);
-
-  byte lowByte = ((p_value >> 0) & 0xFF);
-  byte highByte = ((p_value >> 8) & 0xFF);
-  EEPROM.write(p_address, lowByte);
-  EEPROM.write(p_address + 1, highByte);
-}
-
-//This function will read a 2 byte integer from the eeprom at the specified address and address + 1
-unsigned int eeprom_EEPROMReadInt(int p_address)
-{
-  byte lowByte = EEPROM.read(p_address);
-  byte highByte = EEPROM.read(p_address + 1);
-  return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
-}
-
+//
+////This function will write a 2 byte integer to the eeprom at the specified address and address + 1
+//void eeprom_EEPROMWriteInt(int p_address, int p_value)
+//{
+//  Serial.print(F("Writing Int "));
+//  Serial.print(p_value);
+//  Serial.print(F(" to address "));
+//  Serial.println(p_address);
+//
+//  byte lowByte = ((p_value >> 0) & 0xFF);
+//  byte highByte = ((p_value >> 8) & 0xFF);
+//  EEPROM.write(p_address, lowByte);
+//  EEPROM.write(p_address + 1, highByte);
+//}
+//
+////This function will read a 2 byte integer from the eeprom at the specified address and address + 1
+//unsigned int eeprom_EEPROMReadInt(int p_address)
+//{
+//  byte lowByte = EEPROM.read(p_address);
+//  byte highByte = EEPROM.read(p_address + 1);
+//  return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
+//}
+//
+//
+//// from http://playground.arduino.cc/Code/EEPROMWriteAnything
+//template <class T> int eeprom_writeAnything(int ee, const T& value)
+//{
+//    const byte* p = (const byte*)(const void*)&value;
+//    int i;
+//    for (i = 0; i < sizeof(value); i++)
+//        EEPROM.write(ee++, *p++);
+//    return i;
+//}
+//
+//template <class T> int eeprom_readAnything(int ee, T& value)
+//{
+//    byte* p = (byte*)(void*)&value;
+//    int i;
+//    for (i = 0; i < sizeof(value); i++)
+//        *p++ = EEPROM.read(ee++);
+//    return i;
+//}

@@ -175,16 +175,16 @@ void comms_extractParams(String inS) {
   }
   inNoOfParams = paramNumber;
   
-    Serial.print(F("Command:"));
-    Serial.print(inCmd);
-    Serial.print(F(", p1:"));
-    Serial.print(inParam1);
-    Serial.print(F(", p2:"));
-    Serial.print(inParam2);
-    Serial.print(F(", p3:"));
-    Serial.print(inParam3);
-    Serial.print(F(", p4:"));
-    Serial.println(inParam4);
+//    Serial.print(F("Command:"));
+//    Serial.print(inCmd);
+//    Serial.print(F(", p1:"));
+//    Serial.print(inParam1);
+//    Serial.print(F(", p2:"));
+//    Serial.print(inParam2);
+//    Serial.print(F(", p3:"));
+//    Serial.print(inParam3);
+//    Serial.print(F(", p4:"));
+//    Serial.println(inParam4);
 }
 
 
