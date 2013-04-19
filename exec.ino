@@ -27,10 +27,6 @@ boolean exec_executeBasicCommand(String &com)
     exec_changeLengthDirect();
   else if (com.startsWith(CMD_CHANGEPENWIDTH))
     exec_changePenWidth();
-  else if (com.startsWith(CMD_CHANGEMOTORSPEED))
-    exec_changeMotorSpeed();
-  else if (com.startsWith(CMD_CHANGEMOTORACCEL))
-    exec_changeMotorAcceleration();
   else if (com.startsWith(CMD_SETMOTORSPEED))
     exec_setMotorSpeed();
   else if (com.startsWith(CMD_SETMOTORACCEL))
@@ -39,8 +35,6 @@ boolean exec_executeBasicCommand(String &com)
     pixel_drawSquarePixel();
   else if (com.startsWith(CMD_DRAWSCRIBBLEPIXEL))
     pixel_drawScribblePixel();
-//  else if (com.startsWith(CMD_DRAWRECT))
-//    drawRectangle();
   else if (com.startsWith(CMD_CHANGEDRAWINGDIRECTION))
     exec_changeDrawingDirection();
   else if (com.startsWith(CMD_SETPOSITION))
@@ -77,10 +71,10 @@ void exec_changeDrawingDirection()
 {
   globalDrawDirectionMode = asInt(inParam1);
   globalDrawDirection = asInt(inParam2);
-  Serial.print(F("Changed draw direction mode to be "));
-  Serial.print(globalDrawDirectionMode);
-  Serial.print(F(" and direction is "));
-  Serial.println(globalDrawDirection);
+//  Serial.print(F("Changed draw direction mode to be "));
+//  Serial.print(globalDrawDirectionMode);
+//  Serial.print(F(" and direction is "));
+//  Serial.println(globalDrawDirection);
 }
 
 
@@ -109,6 +103,18 @@ void exec_reportMachineSpec()
   Serial.print(stepMultiplier);
   Serial.println(CMD_END);
 
+  Serial.print(F("PGLIFT,"));
+  Serial.print(downPosition);
+  Serial.print(COMMA);
+  Serial.print(upPosition);
+  Serial.println(CMD_END);
+
+  Serial.print(F("PGSPEED,"));
+  Serial.print(currentMaxSpeed);
+  Serial.print(COMMA);
+  Serial.print(currentAcceleration);
+  Serial.println(CMD_END);
+
 }
 
 void exec_setMachineSizeFromCommand()
@@ -135,6 +141,8 @@ void exec_setMachineSizeFromCommand()
   // reload 
   eeprom_loadMachineSize();
 }
+
+
 void exec_setMachineNameFromCommand()
 {
   String name = inParam1;
@@ -165,18 +173,45 @@ void exec_setMachineStepMultiplierFromCommand()
   EEPROM_writeAnything(EEPROM_MACHINE_STEP_MULTIPLIER, asInt(inParam1));
   eeprom_loadMachineSpecFromEeprom();
 }
+
 void exec_setPenLiftRange()
 {
   int down = asInt(inParam1);
   int up = asInt(inParam2);
-  EEPROM_writeAnything(EEPROM_PENLIFT_DOWN, down);
-  EEPROM_writeAnything(EEPROM_PENLIFT_UP, up);
-  eeprom_loadPenLiftRange();
+  
+  Serial.print(F("Down: "));
+  Serial.println(down);
+  Serial.print(F("Up: "));
+  Serial.println(up);
+  
+  if (inNoOfParams == 4) 
+  {
+    // 4 params (C45,<downpos>,<uppos>,1,END) means save values to EEPROM
+    EEPROM_writeAnything(EEPROM_PENLIFT_DOWN, down);
+    EEPROM_writeAnything(EEPROM_PENLIFT_UP, up);
+    eeprom_loadPenLiftRange();
+  }
+  else if (inNoOfParams == 3)
+  {
+    // 3 params (C45,<downpos>,<uppos>,END) means just do a range test
+    penlift_movePen(down, up, penLiftSpeed);
+    delay(200);
+    penlift_movePen(up, down, penLiftSpeed);
+    delay(200);
+    penlift_movePen(down, up, penLiftSpeed);
+    delay(200);
+    penlift_movePen(up, down, penLiftSpeed);
+    delay(200);
+  }
 }
 
+/* Single parameter to set max speed, add a second parameter of "1" to make it persist.
+*/
 void exec_setMotorSpeed()
 {
   exec_setMotorSpeed(asFloat(inParam1));
+  if (inNoOfParams == 3 && asInt(inParam2) == 1)
+    EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
 }
 
 void exec_setMotorSpeed(float speed)
@@ -188,18 +223,13 @@ void exec_setMotorSpeed(float speed)
   Serial.println(currentMaxSpeed);
 }
 
-void exec_changeMotorSpeed()
-{
-  float speedChange = asFloat(inParam1);
-  float newSpeed = currentMaxSpeed + speedChange;
-  exec_setMotorSpeed(newSpeed);
-}
-
-
- 
+/* Single parameter to set acceleration, add a second parameter of "1" to make it persist.
+*/
 void exec_setMotorAcceleration()
 {
   exec_setMotorAcceleration(asFloat(inParam1));
+  if (inNoOfParams == 3 && asInt(inParam2) == 1)
+    EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
 }
 void exec_setMotorAcceleration(float accel)
 {
@@ -208,12 +238,6 @@ void exec_setMotorAcceleration(float accel)
   motorB.setAcceleration(currentAcceleration);
   Serial.print(F("New acceleration: "));
   Serial.println(currentAcceleration);
-}
-void exec_changeMotorAcceleration()
-{
-  float speedChange = asFloat(inParam1);
-  float newAccel = currentAcceleration + speedChange;
-  exec_setMotorAcceleration(newAccel);
 }
 
 void exec_changePenWidth()
@@ -269,7 +293,6 @@ void exec_changeLengthDirect()
   }
   else
   {
-  Serial.println("dr.5");
     exec_drawBetweenPoints(startA, startB, endA, endB, maxSegmentLength);
   }
 }  
@@ -295,8 +318,19 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   float c2y = getCartesianYFP(c2x, p2a);
   
   // test to see if it's on the page
-  if (c2x > 20 && c2x<pageWidth-20 && c2y > 20 && c2y <pageHeight-20)
-  {
+  // AND ALSO TO see if the current position is on the page.
+  // Remember, the native system can easily specify points that can't exist,
+  // particularly up at the top.
+  if (c2x > 20 
+    && c2x<pageWidth-20 
+    && c2y > 20 
+    && c2y <pageHeight-20
+    && c1x > 20 
+    && c1x<pageWidth-20 
+    && c1y > 20 
+    && c1y <pageHeight-20 
+    )
+    {
     reportingPosition = false;
     float deltaX = c2x-c1x;    // distance each must move (signed)
     float deltaY = c2y-c1y;
@@ -330,6 +364,8 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     usingAcceleration = false;
     while (linesegs > 0)
     {
+//      Serial.print("Line segment: " );
+//      Serial.println(linesegs);
       // compute next new location
       c1x = c1x + deltaX;
       c1y = c1y + deltaY;
@@ -341,7 +377,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
       // do the move
       runSpeed = desiredSpeed(linesegs, runSpeed, currentAcceleration*4);
       
-//      Serial.print("Runspeed:");
+//      Serial.print("Setting speed:");
 //      Serial.println(runSpeed);
       
       motorA.setSpeed(runSpeed);
@@ -353,8 +389,6 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     }
     
     // do the end point in case theres been some rounding errors etc
-    motorA.setSpeed(0);
-    motorB.setSpeed(0);
     reportingPosition = true;
     changeLength(p2a, p2b);
     

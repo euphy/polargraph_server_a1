@@ -90,7 +90,7 @@ void pixel_drawSquarePixel()
     }
     changeLength(endPointA, endPointB);
     
-    outputAvailableMemory(); 
+    //outputAvailableMemory(); 
 }
 
 byte pixel_getRandomDrawDirection()

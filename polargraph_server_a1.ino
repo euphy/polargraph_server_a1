@@ -223,9 +223,7 @@ void setup()
   readyString = READY;
   comms_establishContact();
 
-  //testServoRange();
-  penlift_movePenUp();
-
+  penlift_penUp();
   delay(500);
   outputAvailableMemory();
 }

@@ -27,7 +27,7 @@ void eeprom_resetEeprom()
 }
 void eeprom_dumpEeprom()
 {
-  for (int i = 0; i <20; i++)
+  for (int i = 0; i <40; i++)
   {
     Serial.print(i);
     Serial.print(". ");
@@ -76,7 +76,7 @@ void eeprom_loadSpoolSpec()
 void eeprom_loadPenLiftRange()
 {
   EEPROM_readAnything(EEPROM_PENLIFT_DOWN, downPosition);
-  if (downPosition < 1)
+  if (downPosition < 0)
   {
     downPosition = DEFAULT_DOWN_POSITION;
   }
@@ -84,7 +84,7 @@ void eeprom_loadPenLiftRange()
   Serial.println(downPosition);
 
   EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
-  if (upPosition < 1)
+  if (upPosition < 0)
   {
     upPosition = DEFAULT_UP_POSITION;
   }
@@ -120,6 +120,24 @@ void eeprom_loadStepMultiplier()
   Serial.println(stepMultiplier);  
 }  
 
+void eeprom_loadSpeed()
+{
+  // load speed, acceleration
+  EEPROM_readAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
+  
+  // not sure why this requires a cast to int for the comparision, but a 
+  // if (currentMaxSpeed < 1.0) wasn't catching cases where 
+  // currentMaxSpeed == 0.00, ODD.
+  if (int(currentMaxSpeed) < 1) {
+    currentMaxSpeed = 800.0;
+  }
+    
+  EEPROM_readAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
+  if (int(currentAcceleration) < 1) {
+    currentAcceleration = 800.0;
+  }
+}
+
 void eeprom_loadMachineSpecFromEeprom()
 {
   impl_loadMachineSpecFromEeprom();
@@ -129,22 +147,12 @@ void eeprom_loadMachineSpecFromEeprom()
   eeprom_loadStepMultiplier();
   eeprom_loadMachineName();
   eeprom_loadPenLiftRange();
+  eeprom_loadSpeed();
 
-  
-  // load speed, acceleration
-  EEPROM_readAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
-  if (currentMaxSpeed < 1)
-    currentMaxSpeed = 800.0;
-    
-  EEPROM_readAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
-  if (currentAcceleration < 1)
-    currentAcceleration = 800.0;
-    
   // load penwidth
   EEPROM_readAnything(EEPROM_MACHINE_PEN_WIDTH, penWidth);
   if (penWidth < 0.0001)
     penWidth = 0.8;
-  
 
   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;

@@ -40,14 +40,15 @@ String comms_waitForNextCommand()
     // this also sets usingCrc AND commandConfirmed
     // to true or false
     inS = comms_readCommand();
+
+    // if it's using the CRC check, then confirmation is easy
+    if (usingCrc && !commandConfirmed)
+    {
+      comms_requestResend();
+      inS = "";
+    }
   }
   
-  // if it's using the CRC check, then confirmation is easy
-  if (usingCrc && !commandConfirmed)
-  {
-    comms_requestResend();
-    return "";
-  }
   
   // CRC was ok, or we aren't using one
   idleTime = millis();
@@ -76,7 +77,7 @@ String comms_readCommand()
   while (Serial.available() > 0)
   {
     char ch = Serial.read();       // get it
-    delay(15);
+    delay(1);
     inString[inCount] = ch;
     if (ch == INTERMINATOR)
     {
@@ -87,7 +88,7 @@ String comms_readCommand()
   }
   inString[inCount] = 0;                     // null terminate the string
   String inS = inString;
-
+  
   // check the CRC for this command
   // and set commandConfirmed true or false
   int colonPos = inS.lastIndexOf(":");
@@ -106,10 +107,13 @@ String comms_readCommand()
     }
     else
     {
+      Serial.print(F("I got "));
+      Serial.println(inString);
       Serial.print(F("Checksum not matched!:"));
       Serial.println(calcCrc);
       commandConfirmed = false;
     }
+
   }
   else
   {
@@ -127,14 +131,18 @@ void comms_parseAndExecuteCommand(String &in)
   if (commandParsed)
   {
     impl_processCommand(lastCommand);
+    in = "";
+    commandConfirmed = false;
+    comms_ready();
   }
   else
   {
-    Serial.println(F("Command not parsed."));
+    Serial.print(F("Command ("));
+    Serial.print(in);
+    Serial.println(F(") not parsed."));
   }
-  in = "";
-  commandConfirmed = false;
-  comms_ready();
+  inNoOfParams = 0;
+  
 }
 
 
