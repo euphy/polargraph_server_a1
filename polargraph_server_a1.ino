@@ -31,7 +31,7 @@ something like polargraph_server_a1.ino.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.5";
+const String FIRMWARE_VERSION_NO = "1.62";
 
 // for working out CRCs
 static PROGMEM prog_uint32_t crc_table[16] = {
@@ -44,33 +44,33 @@ static PROGMEM prog_uint32_t crc_table[16] = {
 boolean usingCrc = false;
 
 //  EEPROM addresses
-const byte EEPROM_MACHINE_WIDTH = 0;
-const byte EEPROM_MACHINE_HEIGHT = 2;
-const byte EEPROM_MACHINE_NAME = 4;
-const byte EEPROM_MACHINE_MM_PER_REV = 14;
-const byte EEPROM_MACHINE_STEPS_PER_REV = 16;
-const int EEPROM_MACHINE_STEP_MULTIPLIER = 18;
+const int EEPROM_MACHINE_WIDTH = 0;
+const int EEPROM_MACHINE_HEIGHT = 2;
+const int EEPROM_MACHINE_NAME = 4;
+const int EEPROM_MACHINE_MM_PER_REV = 14; // 4 bytes (float)
+const int EEPROM_MACHINE_STEPS_PER_REV = 18;
+const int EEPROM_MACHINE_STEP_MULTIPLIER = 20;
 
-const int EEPROM_MACHINE_MOTOR_SPEED = 20;
-const int EEPROM_MACHINE_MOTOR_ACCEL = 22;
-const int EEPROM_MACHINE_PEN_WIDTH = 24;
 
-const long EEPROM_MACHINE_HOME_A = 26; // to 29
-const long EEPROM_MACHINE_HOME_B = 30; // to 33
+const int EEPROM_MACHINE_MOTOR_SPEED = 22; // 4 bytes float
+const int EEPROM_MACHINE_MOTOR_ACCEL = 26; // 4 bytes float
+const int EEPROM_MACHINE_PEN_WIDTH = 30; // 4 bytes float
 
-const int EEPROM_PENLIFT_DOWN = 34; // 2 bytes
-const int EEPROM_PENLIFT_UP = 36; // 2 bytes
+const long EEPROM_MACHINE_HOME_A = 34; // 4 bytes
+const long EEPROM_MACHINE_HOME_B = 38; // 4 bytes
+
+const int EEPROM_PENLIFT_DOWN = 42; // 2 bytes
+const int EEPROM_PENLIFT_UP = 44; // 2 bytes
 
 // Pen raising servo
 Servo penHeight;
 const int DEFAULT_DOWN_POSITION = 90;
-const int DEFAULT_UP_POSITION = 180;
+const int DEFAULT_UP_POSITION = 0;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
 static int penLiftSpeed = 3; // ms between steps of moving motor
 int const PEN_HEIGHT_SERVO_PIN = 9;
-boolean isPenUp = true;
-
+boolean isPenUp = false;
 
 int motorStepsPerRev = 800;
 float mmPerRev = 95;

@@ -194,13 +194,13 @@ void exec_setPenLiftRange()
   else if (inNoOfParams == 3)
   {
     // 3 params (C45,<downpos>,<uppos>,END) means just do a range test
-    penlift_movePen(down, up, penLiftSpeed);
-    delay(200);
     penlift_movePen(up, down, penLiftSpeed);
     delay(200);
     penlift_movePen(down, up, penLiftSpeed);
     delay(200);
     penlift_movePen(up, down, penLiftSpeed);
+    delay(200);
+    penlift_movePen(down, up, penLiftSpeed);
     delay(200);
   }
 }
@@ -387,11 +387,8 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
       // one line less to do!
       linesegs--;
     }
-    
-    // do the end point in case theres been some rounding errors etc
+    // reset back to "normal" operation
     reportingPosition = true;
-    changeLength(p2a, p2b);
-    
     usingAcceleration = true;
   }
   else
