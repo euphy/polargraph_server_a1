@@ -124,7 +124,7 @@ boolean acceleration = true;
 extern AccelStepper motorA;
 extern AccelStepper motorB;
 
-boolean currentlyRunning = false;
+boolean currentlyRunning = true;
 
 static String inCmd = "                                                  ";
 static String inParam1 = "              ";

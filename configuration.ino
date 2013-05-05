@@ -45,7 +45,6 @@ void configuration_setup()
   defaultMmPerRev = 95;
   defaultStepsPerRev = 400;
   defaultStepMultiplier = 1;
-  currentlyRunning = true;
   delay(500);
 }
 // end of Adafruit motorshield definition
