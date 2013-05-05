@@ -31,7 +31,7 @@ something like polargraph_server_a1.ino.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.62";
+const String FIRMWARE_VERSION_NO = "1.63";
 
 // for working out CRCs
 static PROGMEM prog_uint32_t crc_table[16] = {
