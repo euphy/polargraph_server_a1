@@ -32,61 +32,21 @@ long divider(long in)
 }
 
 
-void transform(float &tA, float &tB)
+
+
+//void changeLength(long tA, long tB)
+//{
+//  changeLength((float)tA, (float)tB);
+//}
+
+void changeLength(long tAl, long tBl)
 {
-//  Serial.print("In tA:");
-//  Serial.println(tA);
-//  Serial.print("In tB:");
-//  Serial.println(tB);
-
-  tA = tA * scaleX;
-  tB = tB * scaleY;
-
-  // rotate
-  
-  if (rotateTransform >45 && rotateTransform <= 135) // 90 degree rotation
-  {
-    float temp = tA;
-    tA = -tB;
-    tB = temp;
-  }
-  else if (rotateTransform > 135 && rotateTransform <= 225) // 180 degree rotation
-  {
-    tA = -tA;
-    tB = -tB;
-  }
-  else if (rotateTransform > 225 && rotateTransform <= 315) // 270 degree rotation
-  {
-    float temp = tA;
-    tA = tB;
-    tB = -temp;
-  }
-  else // no rotation 
-  {
-    
-  }
-  
-  tA = tA + translateX;
-  tB = tB + translateY;
-
-//  Serial.print("Out tA:");
-//  Serial.println(tA);
-//  Serial.print("Out tB:");
-//  Serial.println(tB);
-  
-}
-
-void changeLength(long tA, long tB)
-{
-  changeLength((float)tA, (float)tB);
-}
-
-void changeLength(float tA, float tB)
-{
+  float tA = float(tAl);
+  float tB = float(tBl);
 //  Serial.println("changeLenth-float");
   lastOperationTime = millis();
 
-  transform(tA,tB);
+  impl_transform(tA,tB);
   
   float currSpeedA = motorA.speed();
   float currSpeedB = motorB.speed();
@@ -195,7 +155,7 @@ long getMaxLength()
   {
     float length = getMachineA(pageWidth, pageHeight);
     maxLength = long(length+0.5);
-    Serial.print("Calculated maxLength: ");
+    Serial.print(F("Calculated maxLength: "));
     Serial.println(maxLength);
   }
   return maxLength;
@@ -213,29 +173,26 @@ float getMachineB(float cX, float cY)
   return b;
 }
 
-void moveA(int dist)
+void moveAxis(AccelStepper &m, int dist)
 {
-  motorA.move(dist);
-  while (motorA.distanceToGo() != 0)
+  m.move(dist);
+  while (m.distanceToGo() != 0)
   {
     impl_runBackgroundProcesses();
     if (currentlyRunning)
-      motorA.run();
+      m.run();
   }
   lastOperationTime = millis();
 }
 
-void moveB(int dist)
-{
-  motorB.move(dist);
-  while (motorB.distanceToGo() != 0)
-  {
-    impl_runBackgroundProcesses();
-    if (currentlyRunning)
-      motorB.run();
-  }
-  lastOperationTime = millis();
-}
+//void moveA(int dist)
+//{
+//  moveAxis(motorA, dist);
+//}
+//void moveB(int dist)
+//{
+//  moveAxis(motorB, dist);
+//}
 
 void reportPosition()
 {
@@ -262,17 +219,17 @@ void reportPosition()
 
 
 
-void engageMotors()
-{
-  impl_engageMotors();
-}
-
-void releaseMotors()
-{
-  impl_releaseMotors();
-}
-
-
+//void engageMotors()
+//{
+//  impl_engageMotors();
+//}
+//
+//void releaseMotors()
+//{
+//  impl_releaseMotors();
+//}
+//
+//
 float getCartesianXFP(float aPos, float bPos)
 {
   float calcX = (sq(pageWidth) - sq(bPos) + sq(aPos)) / (pageWidth*2);

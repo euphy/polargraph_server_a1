@@ -40,3 +40,6 @@ void impl_releaseMotors()
   penlift_penUp();
 }
 
+void impl_transform(float &tA, float &tB)
+{ 
+}

@@ -31,7 +31,7 @@ something like polargraph_server_a1.ino.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.63";
+const String FIRMWARE_VERSION_NO = "1.64";
 
 // for working out CRCs
 static PROGMEM prog_uint32_t crc_table[16] = {
@@ -41,40 +41,39 @@ static PROGMEM prog_uint32_t crc_table[16] = {
     0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
 };
 
-boolean usingCrc = false;
+static boolean usingCrc = false;
 
 //  EEPROM addresses
-const int EEPROM_MACHINE_WIDTH = 0;
-const int EEPROM_MACHINE_HEIGHT = 2;
-const int EEPROM_MACHINE_NAME = 4;
-const int EEPROM_MACHINE_MM_PER_REV = 14; // 4 bytes (float)
-const int EEPROM_MACHINE_STEPS_PER_REV = 18;
-const int EEPROM_MACHINE_STEP_MULTIPLIER = 20;
+const byte EEPROM_MACHINE_WIDTH = 0;
+const byte EEPROM_MACHINE_HEIGHT = 2;
+const byte EEPROM_MACHINE_NAME = 4;
+const byte EEPROM_MACHINE_MM_PER_REV = 14; // 4 bytes (float)
+const byte EEPROM_MACHINE_STEPS_PER_REV = 18;
+const byte EEPROM_MACHINE_STEP_MULTIPLIER = 20;
 
+const byte EEPROM_MACHINE_MOTOR_SPEED = 22; // 4 bytes float
+const byte EEPROM_MACHINE_MOTOR_ACCEL = 26; // 4 bytes float
+const byte EEPROM_MACHINE_PEN_WIDTH = 30; // 4 bytes float
 
-const int EEPROM_MACHINE_MOTOR_SPEED = 22; // 4 bytes float
-const int EEPROM_MACHINE_MOTOR_ACCEL = 26; // 4 bytes float
-const int EEPROM_MACHINE_PEN_WIDTH = 30; // 4 bytes float
+const byte EEPROM_MACHINE_HOME_A = 34; // 4 bytes
+const byte EEPROM_MACHINE_HOME_B = 38; // 4 bytes
 
-const long EEPROM_MACHINE_HOME_A = 34; // 4 bytes
-const long EEPROM_MACHINE_HOME_B = 38; // 4 bytes
-
-const int EEPROM_PENLIFT_DOWN = 42; // 2 bytes
-const int EEPROM_PENLIFT_UP = 44; // 2 bytes
+const byte EEPROM_PENLIFT_DOWN = 42; // 2 bytes
+const byte EEPROM_PENLIFT_UP = 44; // 2 bytes
 
 // Pen raising servo
 Servo penHeight;
 const int DEFAULT_DOWN_POSITION = 90;
-const int DEFAULT_UP_POSITION = 0;
+const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
 static int penLiftSpeed = 3; // ms between steps of moving motor
-int const PEN_HEIGHT_SERVO_PIN = 9;
+byte const PEN_HEIGHT_SERVO_PIN = 9;
 boolean isPenUp = false;
 
 int motorStepsPerRev = 800;
 float mmPerRev = 95;
-int stepMultiplier = 1;
+byte stepMultiplier = 1;
 
 static float translateX = 0.0;
 static float translateY = 0.0;
@@ -107,12 +106,12 @@ long pageWidth = machineWidth * stepsPerMM;
 long pageHeight = machineHeight * stepsPerMM;
 long maxLength = 0;
 
-static String rowAxis = "A";
+//static char rowAxis = 'A';
 const int INLENGTH = 50;
 const char INTERMINATOR = 10;
 
-const String DIRECTION_STRING_LTR = "LTR";
-static int SRAM_SIZE = 2048;
+//const char DIRECTION_STRING_LTR = 'L';
+//static int SRAM_SIZE = 2048;
 const String FREE_MEMORY_STRING = "MEMORY,";
 int availMem = 0;
 
@@ -132,7 +131,7 @@ static String inParam2 = "              ";
 static String inParam3 = "              ";
 static String inParam4 = "              ";
 
-int inNoOfParams;
+byte inNoOfParams;
 
 int rebroadcastReadyInterval = 5000L;
 long lastOperationTime = 0L;
@@ -142,7 +141,7 @@ boolean automaticPowerDown = false;
 long lastInteractionTime = 0L;
 
 static boolean lastWaveWasTop = true;
-static boolean lastMotorBiasWasA = true;
+//static boolean lastMotorBiasWasA = true;
 //static boolean drawingLeftToRight = true;
 
 //  Drawing direction
@@ -160,16 +159,16 @@ static int globalDrawDirection = DIR_NW;
 const static byte DIR_MODE_AUTO = 1;
 const static byte DIR_MODE_PRESET = 2;
 const static byte DIR_MODE_RANDOM = 3;
-static int globalDrawDirectionMode = DIR_MODE_AUTO;
+static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 
 
-static int currentRow = 0;
+//static int currentRow = 0;
 
 const String READY = "READY";
 const String RESEND = "RESEND";
 const String DRAWING = "DRAWING";
-const static String OUT_CMD_CARTESIAN = "CARTESIAN,";
-const static String OUT_CMD_SYNC = "SYNC,";
+const String OUT_CMD_CARTESIAN = "CARTESIAN,";
+const String OUT_CMD_SYNC = "SYNC,";
 
 static String readyString = READY;
 

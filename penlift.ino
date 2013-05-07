@@ -89,7 +89,3 @@ void penlift_penDown()
   isPenUp = false;
 }
 
-void penlift_testRange()
-{
-  
-}
