@@ -232,7 +232,7 @@ void reportPosition()
 //
 float getCartesianXFP(float aPos, float bPos)
 {
-  float calcX = (sq(pageWidth) - sq(bPos) + sq(aPos)) / (pageWidth*2);
+  float calcX = (sq((float)pageWidth) - sq(bPos) + sq(aPos)) / ((float)pageWidth*2);
   return calcX;  
 }
 float getCartesianYFP(float cX, float aPos) 
