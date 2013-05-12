@@ -390,6 +390,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     // reset back to "normal" operation
     reportingPosition = true;
     usingAcceleration = true;
+    reportPosition();
   }
   else
   {
