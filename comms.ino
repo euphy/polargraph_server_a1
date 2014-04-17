@@ -107,9 +107,9 @@ String comms_readCommand()
     }
     else
     {
-      Serial.print(F("I got "));
+      Serial.print(F("Rcd: "));
       Serial.println(inString);
-      Serial.print(F("Checksum not matched!:"));
+      Serial.print(F("Bad Sum:"));
       Serial.println(calcCrc);
       commandConfirmed = false;
     }
@@ -137,7 +137,7 @@ void comms_parseAndExecuteCommand(String &in)
   }
   else
   {
-    Serial.print(F("Command ("));
+    Serial.print(F("Comm ("));
     Serial.print(in);
     Serial.println(F(") not parsed."));
   }
@@ -238,9 +238,8 @@ void comms_requestResend()
 }
 void comms_unrecognisedCommand(String &com)
 {
-  Serial.print(F("Sorry, "));
   Serial.print(com);
-  Serial.println(F(" isn't a command I recognise."));
+  Serial.println(F(" not recognised."));
 }  
 
 

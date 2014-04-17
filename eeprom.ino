@@ -92,23 +92,6 @@ void eeprom_loadPenLiftRange()
   Serial.println(upPosition);
 }  
 
-void eeprom_loadMachineName()
-{
-  String name = "";
-  for (int i = 0; i < 8; i++)
-  {
-    char b = EEPROM.read(EEPROM_MACHINE_NAME+i);
-    name = name + b;
-  }
-  
-  if (name[0] == 0)
-    name = DEFAULT_MACHINE_NAME;
-  maxLength = 0;
-  machineName = name;
-  Serial.print(F("Loaded machine name:"));
-  Serial.println(machineName);
-}
-
 void eeprom_loadStepMultiplier()
 {
   EEPROM_readAnything(EEPROM_MACHINE_STEP_MULTIPLIER, stepMultiplier);
@@ -145,7 +128,6 @@ void eeprom_loadMachineSpecFromEeprom()
   eeprom_loadMachineSize();
   eeprom_loadSpoolSpec();
   eeprom_loadStepMultiplier();
-  eeprom_loadMachineName();
   eeprom_loadPenLiftRange();
   eeprom_loadSpeed();
 
@@ -177,45 +159,4 @@ void eeprom_loadMachineSpecFromEeprom()
 
   maxLength = 0;
 }
-//
-////This function will write a 2 byte integer to the eeprom at the specified address and address + 1
-//void eeprom_EEPROMWriteInt(int p_address, int p_value)
-//{
-//  Serial.print(F("Writing Int "));
-//  Serial.print(p_value);
-//  Serial.print(F(" to address "));
-//  Serial.println(p_address);
-//
-//  byte lowByte = ((p_value >> 0) & 0xFF);
-//  byte highByte = ((p_value >> 8) & 0xFF);
-//  EEPROM.write(p_address, lowByte);
-//  EEPROM.write(p_address + 1, highByte);
-//}
-//
-////This function will read a 2 byte integer from the eeprom at the specified address and address + 1
-//unsigned int eeprom_EEPROMReadInt(int p_address)
-//{
-//  byte lowByte = EEPROM.read(p_address);
-//  byte highByte = EEPROM.read(p_address + 1);
-//  return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
-//}
-//
-//
-//// from http://playground.arduino.cc/Code/EEPROMWriteAnything
-//template <class T> int eeprom_writeAnything(int ee, const T& value)
-//{
-//    const byte* p = (const byte*)(const void*)&value;
-//    int i;
-//    for (i = 0; i < sizeof(value); i++)
-//        EEPROM.write(ee++, *p++);
-//    return i;
-//}
-//
-//template <class T> int eeprom_readAnything(int ee, T& value)
-//{
-//    byte* p = (byte*)(void*)&value;
-//    int i;
-//    for (i = 0; i < sizeof(value); i++)
-//        *p++ = EEPROM.read(ee++);
-//    return i;
-//}
+

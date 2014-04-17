@@ -185,15 +185,6 @@ void moveAxis(AccelStepper &m, int dist)
   lastOperationTime = millis();
 }
 
-//void moveA(int dist)
-//{
-//  moveAxis(motorA, dist);
-//}
-//void moveB(int dist)
-//{
-//  moveAxis(motorB, dist);
-//}
-
 void reportPosition()
 {
   if (reportingPosition)
@@ -203,16 +194,6 @@ void reportPosition()
     Serial.print(COMMA);
     Serial.print(divider(motorB.currentPosition()));
     Serial.println(CMD_END);
-    
-  //  int cX = getCartesianX();
-  //  int cY = getCartesianY(cX, motorA.currentPosition());
-  //  Serial.print(OUT_CMD_CARTESIAN);
-  //  Serial.print(cX*mmPerStep);
-  //  Serial.print(COMMA);
-  //  Serial.print(cY*mmPerStep);
-  //  Serial.println(CMD_END);
-  //
-    //outputAvailableMemory();
   }
 }
 
@@ -259,32 +240,6 @@ long getCartesianY(long cX, float aPos) {
   long calcY = long(sqrt(pow(aPos,2)-pow(cX,2)));
   return calcY;
 }
-
-
-void outputAvailableMemory()
-{
-  int avMem = availableMemory();
-  if (avMem != availMem)
-  {
-    availMem = avMem;
-    Serial.print(FREE_MEMORY_STRING);
-    Serial.print(availMem);
-    Serial.println(CMD_END);
-  }
-}
-
-//from http://www.arduino.cc/playground/Code/AvailableMemory
-int availableMemory() {
-  uint8_t * heapptr, * stackptr;
-  stackptr = (uint8_t *)malloc(4);
-  heapptr = stackptr;
-  free(stackptr);               
-  stackptr = (uint8_t *)(SP);
-  return stackptr - heapptr;
-} 
-
-
-
 
 /*
 Calculating CRCs.  Incoming commands have these appended as a way

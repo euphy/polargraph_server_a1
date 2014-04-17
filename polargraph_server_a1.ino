@@ -18,9 +18,34 @@ The program has a core part that consists of the following files:
 and the first portion of the main file, probably called
 something like polargraph_server_a1.ino.
 
+CONFIGURATION!! Read this!
+==========================
 
+Kung fu is like a game of chess. You must think first! Before you move.
 
+This is a unified codebase for a few different versions of Polargraph Server.
+
+You can control how it is compiled by changing the #define lines below.
+
+Comment the lines below in or out to control what gets compiled.
 */
+
+// Turn on some debugging code
+// ===========================
+//#define DEBUG
+
+// Program features
+// ================
+//#define PIXEL_DRAWING
+#define PENLIFT
+#define VECTOR_LINES
+
+// Specify what kind of motor driver you are using
+// ===============================================
+// REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
+#define ADAFRUIT_MOTORSHIELD_V2
+//#define ADAFRUIT_MOTORSHIELD_V1
+
 
 #include <AccelStepper.h>
 #include <Servo.h>
@@ -31,7 +56,7 @@ something like polargraph_server_a1.ino.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.66";
+const String FIRMWARE_VERSION_NO = "1.7";
 
 // for working out CRCs
 static PROGMEM prog_uint32_t crc_table[16] = {
@@ -46,7 +71,6 @@ static boolean usingCrc = false;
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
 const byte EEPROM_MACHINE_HEIGHT = 2;
-const byte EEPROM_MACHINE_NAME = 4;
 const byte EEPROM_MACHINE_MM_PER_REV = 14; // 4 bytes (float)
 const byte EEPROM_MACHINE_STEPS_PER_REV = 18;
 const byte EEPROM_MACHINE_STEP_MULTIPLIER = 20;
@@ -90,9 +114,6 @@ static int defaultMmPerRev = 95;
 static int defaultStepsPerRev = 800;
 static int defaultStepMultiplier = 1;
 
-String machineName = "";
-const String DEFAULT_MACHINE_NAME = "PG01    ";
-
 float currentMaxSpeed = 800.0;
 float currentAcceleration = 400.0;
 boolean usingAcceleration = true;
@@ -109,11 +130,6 @@ long maxLength = 0;
 //static char rowAxis = 'A';
 const int INLENGTH = 50;
 const char INTERMINATOR = 10;
-
-//const char DIRECTION_STRING_LTR = 'L';
-//static int SRAM_SIZE = 2048;
-const String FREE_MEMORY_STRING = "MEMORY,";
-int availMem = 0;
 
 static float penWidth = 0.8; // line width in mm
 
@@ -140,9 +156,8 @@ boolean automaticPowerDown = false;
 
 long lastInteractionTime = 0L;
 
+#ifdef PIXEL_DRAWING
 static boolean lastWaveWasTop = true;
-//static boolean lastMotorBiasWasA = true;
-//static boolean drawingLeftToRight = true;
 
 //  Drawing direction
 const static byte DIR_NE = 1;
@@ -160,7 +175,7 @@ const static byte DIR_MODE_AUTO = 1;
 const static byte DIR_MODE_PRESET = 2;
 const static byte DIR_MODE_RANDOM = 3;
 static byte globalDrawDirectionMode = DIR_MODE_AUTO;
-
+#endif
 
 //static int currentRow = 0;
 
@@ -181,16 +196,23 @@ const static String CMD_CHANGELENGTH = "C01";
 const static String CMD_CHANGEPENWIDTH = "C02";
 const static String CMD_CHANGEMOTORSPEED = "C03";
 const static String CMD_CHANGEMOTORACCEL = "C04";
+#ifdef PIXEL_DRAWING
 const static String CMD_DRAWPIXEL = "C05";
 const static String CMD_DRAWSCRIBBLEPIXEL = "C06";
 //const static String CMD_DRAWRECT = "C07";
 const static String CMD_CHANGEDRAWINGDIRECTION = "C08";
-const static String CMD_SETPOSITION = "C09";
 const static String CMD_TESTPATTERN = "C10";
 const static String CMD_TESTPENWIDTHSQUARE = "C11";
+#endif
+const static String CMD_SETPOSITION = "C09";
+#ifdef PENLIFT
 const static String CMD_PENDOWN = "C13";
 const static String CMD_PENUP = "C14";
+const static String CMD_SETPENLIFTRANGE = "C45";
+#endif
+#ifdef VECTOR_LINES
 const static String CMD_CHANGELENGTHDIRECT = "C17";
+#endif
 const static String CMD_SETMACHINESIZE = "C24";
 const static String CMD_SETMACHINENAME = "C25";
 const static String CMD_GETMACHINEDETAILS = "C26";
@@ -200,7 +222,6 @@ const static String CMD_SETMACHINESTEPSPERREV = "C30";
 const static String CMD_SETMOTORSPEED = "C31";
 const static String CMD_SETMOTORACCEL = "C32";
 const static String CMD_SETMACHINESTEPMULTIPLIER = "C37";
-const static String CMD_SETPENLIFTRANGE = "C45";
 
 void setup() 
 {
@@ -222,9 +243,11 @@ void setup()
   readyString = READY;
   comms_establishContact();
 
+#ifdef PENLIFT
   penlift_penUp();
+#endif
   delay(500);
-  outputAvailableMemory();
+
 }
 
 void loop()

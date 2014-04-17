@@ -23,40 +23,44 @@ boolean exec_executeBasicCommand(String &com)
   boolean executed = true;
   if (com.startsWith(CMD_CHANGELENGTH))
     exec_changeLength();
+#ifdef VECTOR_LINES
   else if (com.startsWith(CMD_CHANGELENGTHDIRECT))
     exec_changeLengthDirect();
+#endif
   else if (com.startsWith(CMD_CHANGEPENWIDTH))
     exec_changePenWidth();
   else if (com.startsWith(CMD_SETMOTORSPEED))
     exec_setMotorSpeed();
   else if (com.startsWith(CMD_SETMOTORACCEL))
     exec_setMotorAcceleration();
+#ifdef PIXEL_DRAWING
   else if (com.startsWith(CMD_DRAWPIXEL))
     pixel_drawSquarePixel();
   else if (com.startsWith(CMD_DRAWSCRIBBLEPIXEL))
     pixel_drawScribblePixel();
   else if (com.startsWith(CMD_CHANGEDRAWINGDIRECTION))
-    exec_changeDrawingDirection();
-  else if (com.startsWith(CMD_SETPOSITION))
-    exec_setPosition();
+    pixel_changeDrawingDirection();
   else if (com.startsWith(CMD_TESTPENWIDTHSQUARE))
     pixel_testPenWidth();
+#endif
+  else if (com.startsWith(CMD_SETPOSITION))
+    exec_setPosition();
+#ifdef PENLIFT
   else if (com.startsWith(CMD_PENDOWN))
     penlift_penDown();
   else if (com.startsWith(CMD_PENUP))
     penlift_penUp();
+  else if (com.startsWith(CMD_SETPENLIFTRANGE))
+    exec_setPenLiftRange();
+#endif
   else if (com.startsWith(CMD_SETMACHINESIZE))
     exec_setMachineSizeFromCommand();
-  else if (com.startsWith(CMD_SETMACHINENAME))
-    exec_setMachineNameFromCommand();
   else if (com.startsWith(CMD_SETMACHINEMMPERREV))
     exec_setMachineMmPerRevFromCommand();
   else if (com.startsWith(CMD_SETMACHINESTEPSPERREV))
     exec_setMachineStepsPerRevFromCommand();
   else if (com.startsWith(CMD_SETMACHINESTEPMULTIPLIER))
     exec_setMachineStepMultiplierFromCommand();
-  else if (com.startsWith(CMD_SETPENLIFTRANGE))
-    exec_setPenLiftRange();
   else if (com.startsWith(CMD_GETMACHINEDETAILS))
     exec_reportMachineSpec();
   else if (com.startsWith(CMD_RESETEEPROM))
@@ -66,25 +70,9 @@ boolean exec_executeBasicCommand(String &com)
 
   return executed;
 }
-
-void exec_changeDrawingDirection() 
-{
-  globalDrawDirectionMode = asInt(inParam1);
-  globalDrawDirection = asInt(inParam2);
-//  Serial.print(F("Changed draw direction mode to be "));
-//  Serial.print(globalDrawDirectionMode);
-//  Serial.print(F(" and direction is "));
-//  Serial.println(globalDrawDirection);
-}
-
-
 void exec_reportMachineSpec()
 {
   eeprom_dumpEeprom();
-  Serial.print(F("PGNAME,"));
-  Serial.print(machineName);
-  Serial.println(CMD_END);
-  
   Serial.print(F("PGSIZE,"));
   Serial.print(machineWidth);
   Serial.print(COMMA);
@@ -140,20 +128,6 @@ void exec_setMachineSizeFromCommand()
 
   // reload 
   eeprom_loadMachineSize();
-}
-
-
-void exec_setMachineNameFromCommand()
-{
-  String name = inParam1;
-  if (name != DEFAULT_MACHINE_NAME)
-  {
-    for (int i = 0; i < 8; i++)
-    {
-      EEPROM.write(EEPROM_MACHINE_NAME+i, name[i]);
-    }
-  }
-  eeprom_loadMachineSpecFromEeprom();
 }
 
 void exec_setMachineMmPerRevFromCommand()
@@ -278,6 +252,7 @@ void exec_changeLength()
   changeLength(lenA, lenB);
 }
 
+#ifdef VECTOR_LINES
 void exec_changeLengthDirect()
 {
   float endA = multiplier(asFloat(inParam1));
@@ -396,7 +371,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   {
     Serial.println("Line is not on the page. Skipping it.");
   }
-  outputAvailableMemory();
+//  outputAvailableMemory();
 }
 
 // Work out and return a new speed.
@@ -451,4 +426,4 @@ float desiredSpeed(long distanceTo, float currentSpeed, float acceleration)
     //Serial.println(requiredSpeed);
     return requiredSpeed;
 }
-
+#endif

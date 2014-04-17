@@ -20,18 +20,40 @@ Comment out the blocks of code you don't need.
 // =================================================================
 // 1. Adafruit motorshield
 
-#include <AFMotor.h>
-const int stepType = INTERLEAVE;
+// Using Adafruit Motorshield V2? Comment out this one line underneath.
+//#include <AFMotor.h>
 
+// Using Adafruit Motorshield V1? Comment out the three INCLUDE lines below.
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_PWMServoDriver.h"
+
+#ifdef ADAFRUIT_MOTORSHIELD_V1
+const int stepType = INTERLEAVE;
 AF_Stepper afMotorA(motorStepsPerRev, 1);
 AF_Stepper afMotorB(motorStepsPerRev, 2);
 
 void forwarda() { afMotorA.onestep(FORWARD, stepType); }
 void backwarda() { afMotorA.onestep(BACKWARD, stepType); }
-AccelStepper motorA(forwarda, backwarda);
-
 void forwardb() { afMotorB.onestep(FORWARD, stepType); }
 void backwardb() { afMotorB.onestep(BACKWARD, stepType); }
+#endif
+
+#ifdef ADAFRUIT_MOTORSHIELD_V2
+const int stepType = INTERLEAVE;
+
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
+Adafruit_StepperMotor *afMotorA = AFMS.getStepper(motorStepsPerRev, 1);
+Adafruit_StepperMotor *afMotorB = AFMS.getStepper(motorStepsPerRev, 2);
+
+void forwarda() { afMotorA->onestep(FORWARD, stepType); }
+void backwarda() { afMotorA->onestep(BACKWARD, stepType); }
+void forwardb() { afMotorB->onestep(FORWARD, stepType); }
+void backwardb() { afMotorB->onestep(BACKWARD, stepType); }
+#endif
+
+
+AccelStepper motorA(forwarda, backwarda);
 AccelStepper motorB(forwardb, backwardb);
 
 void configuration_motorSetup()
@@ -45,7 +67,11 @@ void configuration_setup()
   defaultMmPerRev = 95;
   defaultStepsPerRev = 400;
   defaultStepMultiplier = 1;
+#ifdef ADAFRUIT_MOTORSHIELD_V2
+  AFMS.begin();  // create with the default frequency 1.6KHz
+#endif
   delay(500);
+  
 }
 // end of Adafruit motorshield definition
 // =================================================================

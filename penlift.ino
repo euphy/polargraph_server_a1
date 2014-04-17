@@ -25,7 +25,7 @@ is already up, there's a good chance it won't be up enough.
 The same goes for the 
 
 */
-
+#ifdef PENLIFT
 void penlift_movePen(int start, int end, int delay_ms)
 {
   penHeight.attach(PEN_HEIGHT_SERVO_PIN);
@@ -88,4 +88,4 @@ void penlift_penDown()
   }
   isPenUp = false;
 }
-
+#endif

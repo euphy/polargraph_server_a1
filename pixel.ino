@@ -13,6 +13,16 @@ This is a biggie, and has the routines necessary for generating and drawing
 the squarewave and scribble pixel styles.
 
 */
+#ifdef PIXEL_DRAWING
+void pixel_changeDrawingDirection() 
+{
+  globalDrawDirectionMode = asInt(inParam1);
+  globalDrawDirection = asInt(inParam2);
+//  Serial.print(F("Changed draw direction mode to be "));
+//  Serial.print(globalDrawDirectionMode);
+//  Serial.print(F(" and direction is "));
+//  Serial.println(globalDrawDirection);
+}
 
 void pixel_drawSquarePixel() 
 {
@@ -138,7 +148,7 @@ void pixel_drawScribblePixel()
     density = pixel_scaleDensity(density, 255, maxDens);
     pixel_drawScribblePixel(originA, originB, size*1.1, density);
     
-    outputAvailableMemory(); 
+//    outputAvailableMemory(); 
 }
 
 void pixel_drawScribblePixel(long originA, long originB, int size, int density) 
@@ -336,89 +346,6 @@ void pixel_drawSquareWaveAlongAxis(AccelStepper &longAxis, AccelStepper &wideAxi
   }
 }
 
-
-//void pixel_drawSquareWaveAlongA(int waveAmplitude, int waveLength, int totalWaves, int waveNo)
-//{
-//  if (waveNo == 0) 
-//  { 
-//    // first one, half a line and an along
-//    Serial.println(F("First wave half"));
-//    if (lastWaveWasTop) {
-//      moveB(waveAmplitude/2);
-//      moveA(waveLength);
-//    }
-//    else {
-//      moveB(0-(waveAmplitude/2));
-//      moveA(waveLength);
-//    }
-//    pixel_flipWaveDirection();
-//  }
-//  else if (waveNo == totalWaves) 
-//  { 
-//    // last one, half a line with no along
-//    if (lastWaveWasTop) {
-//      moveB(waveAmplitude/2);
-//    }
-//    else {
-//      moveB(0-(waveAmplitude/2));
-//    }
-//  }
-//  else 
-//  { 
-//    // intervening lines - full lines, and an along
-//    if (lastWaveWasTop) {
-//      moveB(waveAmplitude);
-//      moveA(waveLength);
-//    }
-//    else {
-//      moveB(0-waveAmplitude);
-//      moveA(waveLength);
-//    }
-//    pixel_flipWaveDirection();
-//  }
-//}
-//
-//void pixel_drawSquareWaveAlongB(int waveAmplitude, int waveLength, int totalWaves, int waveNo)
-//{
-//  if (waveNo == 0) 
-//  { 
-//    // first one, half a line and an along
-//    if (lastWaveWasTop) {
-//      moveA(waveAmplitude/2);
-//      moveB(waveLength);
-//    }
-//    else {
-//      moveA(0-(waveAmplitude/2));
-//      moveB(waveLength);
-//    }
-//    pixel_flipWaveDirection();
-//  }
-//  else if (waveNo == totalWaves) 
-//  { 
-//    // last one, half a line with no along
-//    if (lastWaveWasTop) {
-//      moveA(waveAmplitude/2);
-//    }
-//    else {
-//      moveA(0-(waveAmplitude/2));
-//    }
-//  }
-//  else 
-//  { 
-//    // intervening lines - full lines, and an along
-//    if (lastWaveWasTop) {
-//      moveA(waveAmplitude);
-//      moveB(waveLength);
-//    }
-//    else {
-//      moveA(0-waveAmplitude);
-//      moveB(waveLength);
-//    }
-//    pixel_flipWaveDirection();
-//  }
-//}
-
-
 void pixel_flipWaveDirection()
 {
   if (lastWaveWasTop)
@@ -466,5 +393,6 @@ void pixel_flipWaveDirection()
     
     penWidth = oldPenWidth;
     globalDrawDirectionMode = tempDirectionMode;
-  }    
+  }
+#endif
 
