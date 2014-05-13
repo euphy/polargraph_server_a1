@@ -36,15 +36,15 @@ Comment the lines below in or out to control what gets compiled.
 
 // Program features
 // ================
-//#define PIXEL_DRAWING
+#define PIXEL_DRAWING
 #define PENLIFT
 #define VECTOR_LINES
 
 // Specify what kind of motor driver you are using
 // ===============================================
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-#define ADAFRUIT_MOTORSHIELD_V2
-//#define ADAFRUIT_MOTORSHIELD_V1
+//#define ADAFRUIT_MOTORSHIELD_V2
+#define ADAFRUIT_MOTORSHIELD_V1
 
 
 #include <AccelStepper.h>
