@@ -56,7 +56,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.7";
+const String FIRMWARE_VERSION_NO = "1.9";
 
 // for working out CRCs
 static PROGMEM prog_uint32_t crc_table[16] = {

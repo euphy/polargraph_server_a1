@@ -369,7 +369,8 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   }
   else
   {
-    Serial.println("Line is not on the page. Skipping it.");
+    
+    Serial.println("MSG,E,Line is not on the page. Skipping it.");
   }
 //  outputAvailableMemory();
 }
