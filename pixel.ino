@@ -30,6 +30,20 @@ void pixel_drawSquarePixel()
     long originB = multiplier(asLong(inParam2));
     int size = multiplier(asInt(inParam3));
     int density = asInt(inParam4);
+    
+    /*  Here density is accepted as a recording of BRIGHTNESS, where 0 is black and 255 is white.
+        Later on, density gets scaled to the range that is available for this particular 
+        pixel+pentip combination, and also inverted so that it becomes a recording of DARKNESS,
+        where 0 is white and the higher values are darker.
+        
+        (Using the same variable to save on space, really.)
+        
+        This is because paper is white, and ink is black, and this density value is used to 
+        control how many waves are drawn. 
+        
+        O waves means no ink, so a very light pixel.
+        50 waves means lots of ink, so a much darker pixel.
+    */
 
     int halfSize = size / 2;
     
@@ -82,6 +96,9 @@ void pixel_drawSquarePixel()
       endPointB = originB - halfSize;
     }
 
+    /* pixel_scaleDensity takes it's input value as a BRIGHTNESS value (ie 255 = white),
+       but returns a DARKNESS value (ie 0 = white). 
+       Here I'm using the same variable to hold both, save space in memory. */
     density = pixel_scaleDensity(density, 255, pixel_maxDensity(penWidth, size));
 //    Serial.print(F("Start point: "));
 //    Serial.print(startPointA);
@@ -200,27 +217,39 @@ int pixel_minSegmentSizeForPen(float penSize)
 int pixel_maxDensity(float penSize, int rowSize)
 {
   float rowSizeInMM = mmPerStep * rowSize;
-//  Serial.print(F("rowsize in mm: "));
-//  Serial.print(rowSizeInMM);
-//  Serial.print(F(", mmPerStep: "));
-//  Serial.print(mmPerStep);
-//  Serial.print(F(", rowsize: "));
-//  Serial.println(rowSize);
-  
+#ifdef DEBUG_PIXEL
+  Serial.print(F("MSG,D,rowsize in mm: "));
+  Serial.print(rowSizeInMM);
+  Serial.print(F(", mmPerStep: "));
+  Serial.print(mmPerStep);
+  Serial.print(F(", rowsize: "));
+  Serial.println(rowSize);
+#endif
+
   float numberOfSegments = rowSizeInMM / penSize;
   int maxDens = 1;
   if (numberOfSegments >= 2.0)
     maxDens = int(numberOfSegments);
     
+  if (maxDens <= 2)
+  {
+    Serial.print(MSG);
+    Serial.print(MSG_INFO);
+    Serial.print(F("Max density for penSize: "));
+    Serial.print(penSize);
+    Serial.print(F(", rowSize: "));
+    Serial.print(rowSize);
+    Serial.print(F(" is "));
+    Serial.println(maxDens);
+    Serial.print(MSG);
+    Serial.print(MSG_INFO);
+    Serial.println(F("You probably won't get any detail in this."));
+  }
+    
 //  Serial.print("num of segments float:");
 //  Serial.println(numberOfSegments);
 //
 //    
-//  Serial.print(F("Max density: penSize: "));
-//  Serial.print(penSize);
-//  Serial.print(F(", rowSize: "));
-//  Serial.print(rowSize);
-//  Serial.println(maxDens);
   
   return maxDens;
 }

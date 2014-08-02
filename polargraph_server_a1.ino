@@ -175,6 +175,7 @@ const static byte DIR_MODE_AUTO = 1;
 const static byte DIR_MODE_PRESET = 2;
 const static byte DIR_MODE_RANDOM = 3;
 static byte globalDrawDirectionMode = DIR_MODE_AUTO;
+
 #endif
 
 //static int currentRow = 0;
@@ -184,6 +185,11 @@ const String RESEND = "RESEND";
 const String DRAWING = "DRAWING";
 const String OUT_CMD_CARTESIAN = "CARTESIAN,";
 const String OUT_CMD_SYNC = "SYNC,";
+
+const String MSG = "MSG,";
+const String MSG_ERROR = "E,";
+const String MSG_INFO = "I,";
+const String MSG_DEBUG = "D,";
 
 static String readyString = READY;
 

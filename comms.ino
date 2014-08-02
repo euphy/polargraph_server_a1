@@ -238,6 +238,7 @@ void comms_requestResend()
 }
 void comms_unrecognisedCommand(String &com)
 {
+  Serial.print(F("ERR,E,"));
   Serial.print(com);
   Serial.println(F(" not recognised."));
 }  

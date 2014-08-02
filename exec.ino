@@ -264,7 +264,7 @@ void exec_changeLengthDirect()
 
   if (endA < 20 || endB < 20 || endA > getMaxLength() || endB > getMaxLength())
   {
-    Serial.println(F("This point falls outside the area of this machine. Skipping it."));
+    Serial.println(F("MSG,E,This point falls outside the area of this machine. Skipping it."));
   }
   else
   {
