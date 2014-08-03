@@ -44,8 +44,8 @@ Comment the lines below in or out to control what gets compiled.
 // ===============================================
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
 //#define ADAFRUIT_MOTORSHIELD_V2
-#define ADAFRUIT_MOTORSHIELD_V1
-
+//#define ADAFRUIT_MOTORSHIELD_V1
+#define UNL2003_DRIVER
 
 #include <AccelStepper.h>
 #include <Servo.h>
@@ -136,8 +136,17 @@ static float penWidth = 0.8; // line width in mm
 boolean reportingPosition = true;
 boolean acceleration = true;
 
-extern AccelStepper motorA;
-extern AccelStepper motorB;
+#ifdef UNL2003_DRIVER
+    // Initialize ULN2003 stepper driver
+    // first number is type of stepper motor, 
+    // numbers 2-5 are the arduino pins for each driver
+    // ULN2003 stepper driver flips the middle 2 pins
+    static AccelStepper motorA(4,2,4,3,5);  
+    static AccelStepper motorB(4,6,8,7,9);
+#else
+    extern AccelStepper motorA;
+    extern AccelStepper motorB;
+#endif
 
 boolean currentlyRunning = true;
 
