@@ -53,11 +53,10 @@ void backwardb() { afMotorB->onestep(BACKWARD, stepType); }
 #endif
 
 #ifdef UNL2003
-//const int stepType = MICROSTEP;
-void forwarda() { motorA.move(FORWARD);motorA.run();
-void backwarda() { motorA.move(BACKWARD);motorA.run();
-void forwardb() { motorB.move(FORWARD);motorB.run();
-void backwardb() { motorB.move(BACKWARD);motorB.run();
+void forwarda() { motorA.move(FORWARD);motorA.run(); }
+void backwarda() { motorA.move(BACKWARD);motorA.run(); }
+void forwardb() { motorB.move(FORWARD);motorB.run(); }
+void backwardb() { motorB.move(BACKWARD);motorB.run(); }
 #endif
 
 AccelStepper motorA(forwarda, backwarda);
