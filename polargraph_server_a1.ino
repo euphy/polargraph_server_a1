@@ -137,15 +137,15 @@ boolean reportingPosition = true;
 boolean acceleration = true;
 
 #ifdef UNL2003_DRIVER
-    // Initialize ULN2003 stepper driver
-    // first number is type of stepper motor, 
-    // numbers 2-5 are the arduino pins for each driver
-    // ULN2003 stepper driver flips the middle 2 pins
-    static AccelStepper motorA(4,2,4,3,5);  
-    static AccelStepper motorB(4,6,8,7,9);
+// Initialize ULN2003 stepper driver
+// first number is type of stepper motor, 4 for a normal 4 wire step motor, 8 for a halfstepped normal 4 wire motor
+// numbers 2-5 are the arduino pins for each driver
+// ULN2003 stepper driver flips the middle 2 pins
+static AccelStepper motorA(4, 2,4,3,5);  
+static AccelStepper motorB(4, 6,8,7,9);
 #else
-    extern AccelStepper motorA;
-    extern AccelStepper motorB;
+extern AccelStepper motorA;
+extern AccelStepper motorB;
 #endif
 
 boolean currentlyRunning = true;
