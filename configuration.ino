@@ -37,6 +37,9 @@ void forwarda() { afMotorA.onestep(FORWARD, stepType); }
 void backwarda() { afMotorA.onestep(BACKWARD, stepType); }
 void forwardb() { afMotorB.onestep(FORWARD, stepType); }
 void backwardb() { afMotorB.onestep(BACKWARD, stepType); }
+
+AccelStepper motorA(forwarda, backwarda);
+AccelStepper motorB(forwardb, backwardb);
 #endif
 
 #ifdef ADAFRUIT_MOTORSHIELD_V2
@@ -50,6 +53,9 @@ void forwarda() { afMotorA->onestep(FORWARD, stepType); }
 void backwarda() { afMotorA->onestep(BACKWARD, stepType); }
 void forwardb() { afMotorB->onestep(FORWARD, stepType); }
 void backwardb() { afMotorB->onestep(BACKWARD, stepType); }
+
+AccelStepper motorA(forwarda, backwarda);
+AccelStepper motorB(forwardb, backwardb);
 #endif
 
 #ifdef UNL2003
@@ -58,9 +64,6 @@ void backwarda() { motorA.move(BACKWARD);motorA.run(); }
 void forwardb() { motorB.move(FORWARD);motorB.run(); }
 void backwardb() { motorB.move(BACKWARD);motorB.run(); }
 #endif
-
-AccelStepper motorA(forwarda, backwarda);
-AccelStepper motorB(forwardb, backwardb);
 
 void configuration_motorSetup()
 {
