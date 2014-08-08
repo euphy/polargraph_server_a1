@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 Util.
 
@@ -153,9 +153,9 @@ long getMaxLength()
 {
   if (maxLength == 0)
   {
-    float length = getMachineA(pageWidth, pageHeight);
-    maxLength = long(length+0.5);
-    Serial.print(F("Calculated maxLength: "));
+//    float length = getMachineA(pageWidth, pageHeight);
+    maxLength = long(getMachineA(pageWidth, pageHeight)+0.5);
+    Serial.print(F("maxLength: "));
     Serial.println(maxLength);
   }
   return maxLength;

@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 The program has a core part that consists of the following files:
 
@@ -99,12 +99,6 @@ int motorStepsPerRev = 800;
 float mmPerRev = 95;
 byte stepMultiplier = 1;
 
-static float translateX = 0.0;
-static float translateY = 0.0;
-static float scaleX = 1.0;
-static float scaleY = 1.0;
-static int rotateTransform = 0;
-
 static int machineWidth = 650;
 static int machineHeight = 800;
 
@@ -183,13 +177,13 @@ static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 const String READY = "READY";
 const String RESEND = "RESEND";
 const String DRAWING = "DRAWING";
-const String OUT_CMD_CARTESIAN = "CARTESIAN,";
+//const String OUT_CMD_CARTESIAN = "CARTESIAN,";
 const String OUT_CMD_SYNC = "SYNC,";
 
-const String MSG = "MSG,";
-const String MSG_ERROR = "E,";
-const String MSG_INFO = "I,";
-const String MSG_DEBUG = "D,";
+String MSG = "MSG,";
+String MSG_ERROR = "E,";
+String MSG_INFO = "I,";
+String MSG_DEBUG = "D,";
 
 static String readyString = READY;
 

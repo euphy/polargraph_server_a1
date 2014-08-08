@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 EEPROM.
 
@@ -42,7 +42,8 @@ void eeprom_loadMachineSize()
   {
     machineWidth = defaultMachineWidth;
   }
-  Serial.print(F("Loaded machine width:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("width:"));
   Serial.println(machineWidth);
   
   EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, machineHeight);
@@ -50,7 +51,8 @@ void eeprom_loadMachineSize()
   {
     machineHeight = defaultMachineHeight;
   }
-  Serial.print(F("Loaded machine height:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("height:"));
   Serial.println(machineHeight);
 }
 
@@ -61,7 +63,8 @@ void eeprom_loadSpoolSpec()
   {
     mmPerRev = defaultMmPerRev;
   }
-  Serial.print(F("Loaded mm per rev:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("mmPerRev:"));
   Serial.println(mmPerRev);
 
   EEPROM_readAnything(EEPROM_MACHINE_STEPS_PER_REV, motorStepsPerRev);
@@ -69,7 +72,8 @@ void eeprom_loadSpoolSpec()
   {
     motorStepsPerRev = defaultStepsPerRev;
   }
-  Serial.print(F("Loaded motor steps per rev:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("steps per rev:"));
   Serial.println(motorStepsPerRev);
 }  
 
@@ -80,7 +84,8 @@ void eeprom_loadPenLiftRange()
   {
     downPosition = DEFAULT_DOWN_POSITION;
   }
-  Serial.print(F("Loaded down pos:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("down pos:"));
   Serial.println(downPosition);
 
   EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
@@ -88,7 +93,8 @@ void eeprom_loadPenLiftRange()
   {
     upPosition = DEFAULT_UP_POSITION;
   }
-  Serial.print(F("Loaded up pos:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("up pos:"));
   Serial.println(upPosition);
 }  
 
@@ -99,7 +105,8 @@ void eeprom_loadStepMultiplier()
   {
     stepMultiplier = defaultStepMultiplier;
   }
-  Serial.print(F("Loaded motor step multiplier:"));
+  Serial.print(F("Loaded "));
+  Serial.print(F("step multiplier:"));
   Serial.println(stepMultiplier);  
 }  
 
@@ -138,8 +145,9 @@ void eeprom_loadMachineSpecFromEeprom()
 
   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
-  
-  Serial.print(F("Recalc mmPerStep ("));
+
+  Serial.print(F("Recalc "));
+  Serial.print(F("mmPerStep ("));
   Serial.print(mmPerStep);
   Serial.print(F("), stepsPerMM ("));
   Serial.print(stepsPerMM);
@@ -147,12 +155,15 @@ void eeprom_loadMachineSpecFromEeprom()
   Serial.println();
 
   pageWidth = machineWidth * stepsPerMM;
-  Serial.print(F("Recalc pageWidth in steps ("));
+  Serial.print(F("Recalc "));
+  Serial.print(F("pageWidth in steps ("));
   Serial.print(pageWidth);
   Serial.print(F(")"));
   Serial.println();
   pageHeight = machineHeight * stepsPerMM;
-  Serial.print(F("Recalc pageHeight in steps ("));
+
+  Serial.print(F("Recalc "));
+  Serial.print(F("pageHeight in steps ("));
   Serial.print(pageHeight);
   Serial.print(F(")"));
   Serial.println();

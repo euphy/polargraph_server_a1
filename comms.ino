@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 Comms.
 
@@ -107,6 +107,8 @@ String comms_readCommand()
     }
     else
     {
+      Serial.print(MSG);
+      Serial.print(MSG_ERROR);
       Serial.print(F("Rcd: "));
       Serial.println(inString);
       Serial.print(F("Bad Sum:"));
@@ -137,6 +139,8 @@ void comms_parseAndExecuteCommand(String &in)
   }
   else
   {
+    Serial.print(MSG);
+    Serial.print(MSG_ERROR);
     Serial.print(F("Comm ("));
     Serial.print(in);
     Serial.println(F(") not parsed."));
@@ -238,7 +242,8 @@ void comms_requestResend()
 }
 void comms_unrecognisedCommand(String &com)
 {
-  Serial.print(F("ERR,E,"));
+  Serial.print(MSG);
+  Serial.print(MSG_ERROR);
   Serial.print(com);
   Serial.println(F(" not recognised."));
 }  
