@@ -233,17 +233,13 @@ int pixel_maxDensity(float penSize, int rowSize)
     
   if (maxDens <= 2)
   {
-    Serial.print(MSG);
-    Serial.print(MSG_INFO);
-    Serial.print(F("Max density for penSize: "));
+    Serial.print(F("MSG,I,Max density for penSize: "));
     Serial.print(penSize);
     Serial.print(F(", rowSize: "));
     Serial.print(rowSize);
     Serial.print(F(" is "));
     Serial.println(maxDens);
-    Serial.print(MSG);
-    Serial.print(MSG_INFO);
-    Serial.println(F("You probably won't get any detail in this."));
+    Serial.println(F("MSG,I,You probably won't get any detail in this."));
   }
     
 //  Serial.print("num of segments float:");

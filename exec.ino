@@ -219,8 +219,7 @@ void exec_changePenWidth()
   penWidth = asFloat(inParam1);
   Serial.print(F("Changed Pen width to "));
   Serial.print(penWidth);
-  Serial.print(F("mm"));
-  Serial.println();
+  Serial.println(F("mm"));
 }
 
 void exec_setPosition()
@@ -264,7 +263,7 @@ void exec_changeLengthDirect()
 
   if (endA < 20 || endB < 20 || endA > getMaxLength() || endB > getMaxLength())
   {
-    Serial.println(F("MSG,E,This point falls outside the area of this machine. Skipping it."));
+    Serial.println(F("MSG_ERROR_STRThis point falls outside the area of this machine. Skipping it."));
   }
   else
   {
@@ -370,7 +369,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   else
   {
     
-    Serial.println("MSG,E,Line is not on the page. Skipping it.");
+    Serial.println(F("MSG_ERROR_STRLine is not on the page. Skipping it."));
   }
 //  outputAvailableMemory();
 }

@@ -13,21 +13,22 @@ it contains methods for reading commands from the serial port.
 
 */
 
-String comms_waitForNextCommand()
+char *comms_waitForNextCommand()
 {
   // send ready
   // wait for instruction
   int idleTime = millis();
-  
-  // do this bit until we get a command confirmed
-  // idle
-  String inS = "";
+  char buf[INLENGTH+1];
+  int bufPos = 0;
 
-  // loop while there's no commands coming in
-  while (inS.length() == 0)
+  // loop while there's there isn't a terminated command.
+  // (Note this might mean characters ARE arriving, but just
+  //  that the command hasn't been finished yet.)
+  boolean terminated = false;
+  while (!terminated)
   {
+    // idle time is mostly spent in this loop.
     impl_runBackgroundProcesses();
-    // idle time is spent in this loop.
     int timeSince = millis() - idleTime;
     if (timeSince > rebroadcastReadyInterval)
     {
@@ -36,31 +37,36 @@ String comms_waitForNextCommand()
       idleTime = millis();
     }
     
-    // and now read the command if one exists
-    // this also sets usingCrc AND commandConfirmed
-    // to true or false
-    inS = comms_readCommand();
-
-    // if it's using the CRC check, then confirmation is easy
-    if (usingCrc && !commandConfirmed)
+    // And now read the command if one exists.
+    if (Serial.available() > 0)
     {
-      comms_requestResend();
-      inS = "";
+      // Get the char
+      char ch = Serial.read();
+      
+      // look at it, if it's a terminator, then lets terminate the string
+      if (ch == INTERMINATOR) {
+        buf[bufPos] = 0; // null terminate the string
+        terminated = true;
+      } else {
+        // otherwise, just add it into the buffer
+        buf[bufPos] = ch;
+        bufPos++;
+      }
     }
   }
-  
-  
+
+  // if it's using the CRC check, then confirmation is easy
   // CRC was ok, or we aren't using one
   idleTime = millis();
   lastOperationTime = millis();
   lastInteractionTime = lastOperationTime;
-
-  return inS;
+  return buf;
 }
 
-boolean comms_parseCommand(String inS)
+boolean comms_parseCommand(char* inS)
 {
-  if (inS.endsWith(CMD_END))
+  char* sub = strstr(inS, CMD_END);
+  if (strcmp(sub, CMD_END) == 0) 
   {
     comms_extractParams(inS);
     return true;
@@ -69,80 +75,21 @@ boolean comms_parseCommand(String inS)
     return false;
 }  
 
-String comms_readCommand()
+
+void comms_parseAndExecuteCommand(char* inS)
 {
-  // check if data has been sent from the computer:
-  char inString[INLENGTH+1];
-  int inCount = 0;
-  while (Serial.available() > 0)
-  {
-    char ch = Serial.read();       // get it
-    delay(1);
-    inString[inCount] = ch;
-    if (ch == INTERMINATOR)
-    {
-      Serial.flush();
-      break;
-    }
-    inCount++;
-  }
-  inString[inCount] = 0;                     // null terminate the string
-  String inS = inString;
-  
-  // check the CRC for this command
-  // and set commandConfirmed true or false
-  int colonPos = inS.lastIndexOf(":");
-  if (colonPos != -1)
-  {
-    usingCrc = true;
-    String cs = inS.substring(colonPos+1);
-    long checksum = asLong(cs);
-    inS = inS.substring(0, colonPos);
-    
-    long calcCrc = crc_string(inS);
-    
-    if (calcCrc == checksum)
-    {
-      commandConfirmed = true;
-    }
-    else
-    {
-      Serial.print(MSG);
-      Serial.print(MSG_ERROR);
-      Serial.print(F("Rcd: "));
-      Serial.println(inString);
-      Serial.print(F("Bad Sum:"));
-      Serial.println(calcCrc);
-      commandConfirmed = false;
-    }
-
-  }
-  else
-  {
-    // then fall back and do the ACK - no action here
-    usingCrc = false;
-    commandConfirmed = false;
-  }
-
-  return inS;
-}
-
-void comms_parseAndExecuteCommand(String &in)
-{
-  boolean commandParsed = comms_parseCommand(in);
+  boolean commandParsed = comms_parseCommand(inS);
   if (commandParsed)
   {
     impl_processCommand(lastCommand);
-    in = "";
+    inS = "";
     commandConfirmed = false;
     comms_ready();
   }
   else
   {
-    Serial.print(MSG);
-    Serial.print(MSG_ERROR);
-    Serial.print(F("Comm ("));
-    Serial.print(in);
+    Serial.print(F("MSG_E_STRComm ("));
+    Serial.print(inS);
     Serial.println(F(") not parsed."));
   }
   inNoOfParams = 0;
@@ -150,41 +97,46 @@ void comms_parseAndExecuteCommand(String &in)
 }
 
 
-void comms_extractParams(String inS) {
+void comms_extractParams(char* inS) 
+{
   
-  // get number of parameters
-  // by counting commas
-  int length = inS.length();
+  char * in;
+  strcpy(in, inS);
+  char * param;
   
-  int startPos = 0;
   int paramNumber = 0;
-  for (int i = 0; i < length; i++) {
-    if (inS.charAt(i) == ',') {
-      String param = inS.substring(startPos, i);
-      startPos = i+1;
-      
-      switch(paramNumber) {
+  param = strtok(in, COMMA);
+  while (param != NULL) 
+  {
+      switch(paramNumber) 
+      {
         case 0:
-          inCmd = param;
+          strcpy(inCmd, param);
+//          inCmd = param;
           break;
         case 1:
-          inParam1 = param;
+          strcpy(inParam1, param);
+//          inParam1 = param;
           break;
         case 2:
-          inParam2 = param;
+          strcpy(inParam2, param);
+//          inParam2 = param;
           break;
         case 3:
-          inParam3 = param;
+          strcpy(inParam3, param);
+//          inParam3 = param;
           break;
         case 4:
-          inParam4 = param;
+          strcpy(inParam4, param);
+//          inParam4 = param;
           break;
         default:
           break;
       }
+      param = strtok(NULL, COMMA);
       paramNumber++;
-    }
   }
+
   inNoOfParams = paramNumber;
   
 //    Serial.print(F("Command:"));
@@ -224,26 +176,21 @@ float asFloat(String inParam)
   return atof(paramChar);
 }
 
-void comms_establishContact() 
-{
-  comms_ready();
-}
 void comms_ready()
 {
-  Serial.println(READY);
+  Serial.println(F(READY_STR));
 }
 void comms_drawing()
 {
-  Serial.println(DRAWING);
+  Serial.println(F(DRAWING_STR));
 }
 void comms_requestResend()
 {
-  Serial.println(RESEND);
+  Serial.println(F(RESEND_STR));
 }
 void comms_unrecognisedCommand(String &com)
 {
-  Serial.print(MSG);
-  Serial.print(MSG_ERROR);
+  Serial.print(F("MSG_E_STR"));
   Serial.print(com);
   Serial.println(F(" not recognised."));
 }  
