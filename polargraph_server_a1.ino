@@ -33,7 +33,7 @@ Comment the lines below in or out to control what gets compiled.
 // Turn on some debugging code
 // ===========================
 //#define DEBUG
-//#define DEBUG_COMM
+//#define DEBUG_COMMS
 
 // Program features
 // ================
@@ -166,10 +166,11 @@ static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 #define DRAWING_STR "DRAWING"
 #define OUT_CMD_SYNC_STR "SYNC,"
 
-#define MSG_E_STR MSG,E,
-#define MSG_I_STR MSG,I,
-#define MSG_D_STR MSG,D,
+#define MSG_E_STR "MSG,E,"
+#define MSG_I_STR "MSG,I,"
+#define MSG_D_STR "MSG,D,"
 
+#define POLARGRAPH poop
 const static char COMMA[] = ",";
 const static char CMD_END[] = ",END";
 const static String CMD_CHANGELENGTH = "C01";
@@ -206,7 +207,7 @@ const static String CMD_SETMACHINESTEPMULTIPLIER = "C37";
 void setup() 
 {
   Serial.begin(57600);           // set up Serial library at 57600 bps
-  Serial.print(F("POLARGRAPH ON!"));
+  Serial.print("POLARGRAPH ON!");
   Serial.println();
   configuration_motorSetup();
   eeprom_loadMachineSpecFromEeprom();
@@ -232,6 +233,8 @@ void setup()
 void loop()
 {
   lastCommand = comms_waitForNextCommand();
+  Serial.print(F("Last comm: "));
+  Serial.println(lastCommand);
   comms_parseAndExecuteCommand(lastCommand);
 }
 

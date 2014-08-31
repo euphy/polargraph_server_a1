@@ -55,7 +55,9 @@ void impl_releaseMotors()
 {
   motorA.disableOutputs();
   motorB.disableOutputs();  
+#ifdef PENLIFT 
   penlift_penUp();
+#endif
   powerIsOn = false;  
 }
 //
