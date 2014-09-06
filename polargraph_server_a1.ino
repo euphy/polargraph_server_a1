@@ -43,9 +43,9 @@ Comment the lines below in or out to control what gets compiled.
 // Specify what kind of motor driver you are using
 // ===============================================
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-//#define ADAFRUIT_MOTORSHIELD_V2
+#define ADAFRUIT_MOTORSHIELD_V2
 //#define ADAFRUIT_MOTORSHIELD_V1
-#define UNL2003_DRIVER
+//#define UNL2003_DRIVER
 
 #include <AccelStepper.h>
 #include <Servo.h>
@@ -92,11 +92,11 @@ const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
 static int penLiftSpeed = 3; // ms between steps of moving motor
-byte const PEN_HEIGHT_SERVO_PIN = 9;
+byte const PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
 boolean isPenUp = false;
 
-int motorStepsPerRev = 800;
-float mmPerRev = 95;
+int motorStepsPerRev = 800;//UNL2003 = 4076
+float mmPerRev = 95;//UNL2003 = 25
 byte stepMultiplier = 1;
 
 static float translateX = 0.0;
@@ -110,8 +110,8 @@ static int machineHeight = 800;
 
 static int defaultMachineWidth = 650;
 static int defaultMachineHeight = 650;
-static int defaultMmPerRev = 95;
-static int defaultStepsPerRev = 800;
+static int defaultMmPerRev = 95;//UNL2003 = 25
+static int defaultStepsPerRev = 800;//UNL2003 = 4076
 static int defaultStepMultiplier = 1;
 
 float currentMaxSpeed = 800.0;
@@ -139,10 +139,35 @@ boolean acceleration = true;
 #ifdef UNL2003_DRIVER
 // Initialize ULN2003 stepper driver
 // first number is type of stepper motor, 4 for a normal 4 wire step motor, 8 for a halfstepped normal 4 wire motor
-// numbers 2-5 are the arduino pins for each driver
-// ULN2003 stepper driver flips the middle 2 pins
-static AccelStepper motorA(4, 2,4,3,5);  
-static AccelStepper motorB(4, 6,8,7,9);
+//Connection Directions
+// MotorA
+//ULN2003  Arduino  AcceStepper Init
+//IN1      2        2
+//IN2      3        4
+//IN3      4        3
+//IN4      5        5
+// MotorB
+//ULN2003  Arduino  AcceStepper Init
+//IN1      6        6
+//IN2      7        8
+//IN3      8        7
+//IN4      9        9
+
+//for a 28YBJ-48 Stepper, change these parameters above
+//Step angle (8-step) 5.625deg, 64 steps per rev
+//Step angle (4-step) 11.25deg, 32 steps per rev
+//gear reduction ratio 1/63.68395
+
+// motorStepsPerRev = 32 * 63.68395 = 2038; //for 4 step sequence
+// motorStepsPerRev = 64 * 63.68395 = 4076; //for 8 step sequence
+
+// motorStepsPerRev = 4076;
+// mmPerRev = 63;
+// defaultStepsPerRev = 4076;
+// defaultMmPerRev = 63;
+
+static AccelStepper motorA(8, 6,8,7,9);
+static AccelStepper motorB(8, 2,4,3,5);
 #else
 extern AccelStepper motorA;
 extern AccelStepper motorB;

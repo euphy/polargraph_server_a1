@@ -24,9 +24,9 @@ Comment out the blocks of code you don't need.
 //#include <AFMotor.h>
 
 // Using Adafruit Motorshield V1 or UNL2003? Comment out the three INCLUDE lines below.
-//#include <Wire.h>
-//#include <Adafruit_MotorShield.h>
-//#include "utility/Adafruit_PWMServoDriver.h"
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_PWMServoDriver.h"
 
 #ifdef ADAFRUIT_MOTORSHIELD_V1
 const int stepType = INTERLEAVE;
