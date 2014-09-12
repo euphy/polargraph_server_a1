@@ -13,13 +13,15 @@ it contains methods for reading commands from the serial port.
 
 */
 
-char *comms_waitForNextCommand()
+boolean comms_waitForNextCommand(char *buf)
 {
   // send ready
   // wait for instruction
   long idleTime = millis();
-  char buf[INLENGTH+1];
   int bufPos = 0;
+  for (int i = 0; i<INLENGTH; i++) {
+    buf[i] = 0;
+  }  
   long lastRxTime = 0L;
 
   // loop while there's there isn't a terminated command.
@@ -100,12 +102,12 @@ char *comms_waitForNextCommand()
   idleTime = millis();
   lastOperationTime = millis();
   lastInteractionTime = lastOperationTime;
-  Serial.print("xbuf: ");
+  Serial.print(F("xbuf: "));
   Serial.println(buf);
-  return buf;
+  return true;
 }
 
-void comms_parseAndExecuteCommand(char* inS)
+void comms_parseAndExecuteCommand(char *inS)
 {
   Serial.print("3inS: ");
   Serial.println(inS);
@@ -129,23 +131,23 @@ void comms_parseAndExecuteCommand(char* inS)
   
 }
 
-boolean comms_parseCommand(char* inS)
+boolean comms_parseCommand(char *inS)
 {
-  Serial.print("1inS: ");
+  Serial.print(F("1inS: "));
   Serial.println(inS);
   // strstr returns a pointer to the location of ",END" in the incoming string (inS).
   char* sub = strstr(inS, CMD_END);
-  Serial.print("2inS: ");
+  Serial.print(F("2inS: "));
   Serial.println(inS);
-  sub[strlen(CMD_END)] = 0;
-  Serial.print("4inS: ");
+  sub[strlen(CMD_END)] = 0; // null terminate it directly after the ",END"
+  Serial.print(F("4inS: "));
   Serial.println(inS);
 
-  Serial.print("2Sub: ");
+  Serial.print(F("2Sub: "));
   Serial.println(sub);
   
   
-  Serial.println(CMD_END);
+  Serial.println(strcmp(sub, CMD_END));
   if (strcmp(sub, CMD_END) == 0) 
   {
     comms_extractParams(inS);
@@ -157,20 +159,20 @@ boolean comms_parseCommand(char* inS)
 
 void comms_extractParams(char* inS) 
 {
-  
-  char * in;
+  char in[strlen(inS)];
   strcpy(in, inS);
   char * param;
   
-  Serial.print("In: ");
-  Serial.println(in);
-  Serial.print("InS: ");
-  Serial.println(inS);
+  Serial.print(F("InS: "));
+  Serial.print(inS);
+  Serial.println("...");
+
+  Serial.print(F("In: "));
+  Serial.print(in);
+  Serial.println("...");
   
   int paramNumber = 0;
   param = strtok(in, COMMA);
-  Serial.print("Param: ");
-  Serial.println(param);
   while (param != NULL) 
   {
       switch(paramNumber) 
@@ -195,9 +197,13 @@ void comms_extractParams(char* inS)
       }
       param = strtok(NULL, COMMA);
       paramNumber++;
+//      Serial.print(F("P: "));
+//      Serial.println(param);
   }
 
   inNoOfParams = paramNumber;
+//  Serial.print(F("Ps:"));
+//  Serial.println(inNoOfParams);  
 
 #ifdef DEBUG_COMMS
     Serial.print(F("Command:"));
@@ -217,7 +223,6 @@ void comms_extractParams(char* inS)
 long asLong(String inParam)
 {
   char paramChar[inParam.length() + 1];
-  inParam.toCharArray(paramChar, inParam.length() + 1);
   return atol(paramChar);
 }
 int asInt(String inParam)

@@ -134,7 +134,7 @@ static char inParam4[14];
 
 byte inNoOfParams;
 
-char *lastCommand = "";
+char lastCommand[INLENGTH+1];
 boolean commandConfirmed = false;
 
 int rebroadcastReadyInterval = 5000;
@@ -170,7 +170,6 @@ static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 #define MSG_I_STR "MSG,I,"
 #define MSG_D_STR "MSG,D,"
 
-#define POLARGRAPH poop
 const static char COMMA[] = ",";
 const static char CMD_END[] = ",END";
 const static String CMD_CHANGELENGTH = "C01";
@@ -232,10 +231,13 @@ void setup()
 
 void loop()
 {
-  lastCommand = comms_waitForNextCommand();
-  Serial.print(F("Last comm: "));
-  Serial.println(lastCommand);
-  comms_parseAndExecuteCommand(lastCommand);
+  if (comms_waitForNextCommand(lastCommand)) 
+  {
+    Serial.print(F("Last comm: "));
+    Serial.print(lastCommand);
+    Serial.println(F("..."));
+    comms_parseAndExecuteCommand(lastCommand);
+  }
 }
 
 
