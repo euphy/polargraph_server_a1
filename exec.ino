@@ -107,8 +107,8 @@ void exec_reportMachineSpec()
 
 void exec_setMachineSizeFromCommand()
 {
-  int width = asInt(inParam1);
-  int height = asInt(inParam2);
+  int width = atoi(inParam1);
+  int height = atoi(inParam2);
 
   // load to get current settings
   int currentValue = width;
@@ -132,26 +132,24 @@ void exec_setMachineSizeFromCommand()
 
 void exec_setMachineMmPerRevFromCommand()
 {
-  float mmPerRev = asFloat(inParam1);
-  EEPROM_writeAnything(EEPROM_MACHINE_MM_PER_REV, mmPerRev);
+  EEPROM_writeAnything(EEPROM_MACHINE_MM_PER_REV, (float)atof(inParam1));
   eeprom_loadMachineSpecFromEeprom();
 }
 void exec_setMachineStepsPerRevFromCommand()
 {
-  int stepsPerRev = asInt(inParam1);
-  EEPROM_writeAnything(EEPROM_MACHINE_STEPS_PER_REV, stepsPerRev);
+  EEPROM_writeAnything(EEPROM_MACHINE_STEPS_PER_REV, atoi(inParam1));
   eeprom_loadMachineSpecFromEeprom();
 }
 void exec_setMachineStepMultiplierFromCommand()
 {
-  EEPROM_writeAnything(EEPROM_MACHINE_STEP_MULTIPLIER, asInt(inParam1));
+  EEPROM_writeAnything(EEPROM_MACHINE_STEP_MULTIPLIER, atoi(inParam1));
   eeprom_loadMachineSpecFromEeprom();
 }
 
 void exec_setPenLiftRange()
 {
-  int down = asInt(inParam1);
-  int up = asInt(inParam2);
+  int down = atoi(inParam1);
+  int up = atoi(inParam2);
   
   Serial.print(F("Down: "));
   Serial.println(down);
@@ -183,8 +181,8 @@ void exec_setPenLiftRange()
 */
 void exec_setMotorSpeed()
 {
-  exec_setMotorSpeed(asFloat(inParam1));
-  if (inNoOfParams == 3 && asInt(inParam2) == 1)
+  exec_setMotorSpeed((float)atof(inParam1));
+  if (inNoOfParams == 3 && atoi(inParam2) == 1)
     EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
 }
 
@@ -201,8 +199,8 @@ void exec_setMotorSpeed(float speed)
 */
 void exec_setMotorAcceleration()
 {
-  exec_setMotorAcceleration(asFloat(inParam1));
-  if (inNoOfParams == 3 && asInt(inParam2) == 1)
+  exec_setMotorAcceleration((float)atof(inParam1));
+  if (inNoOfParams == 3 && atoi(inParam2) == 1)
     EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
 }
 void exec_setMotorAcceleration(float accel)
@@ -210,13 +208,13 @@ void exec_setMotorAcceleration(float accel)
   currentAcceleration = accel;
   motorA.setAcceleration(currentAcceleration);
   motorB.setAcceleration(currentAcceleration);
-  Serial.print(F("New acceleration: "));
+  Serial.print(F("New accel: "));
   Serial.println(currentAcceleration);
 }
 
 void exec_changePenWidth()
 {
-  penWidth = asFloat(inParam1);
+  penWidth = atof(inParam1);
   Serial.print(F("Changed Pen width to "));
   Serial.print(penWidth);
   Serial.println(F("mm"));
@@ -224,8 +222,13 @@ void exec_changePenWidth()
 
 void exec_setPosition()
 {
-  long targetA = multiplier(asLong(inParam1));
-  long targetB = multiplier(asLong(inParam2));
+  Serial.print(F("Set pos: "));
+  Serial.println(inParam1);
+  Serial.println(inParam2);
+  long targetA = multiplier(atol(inParam1));
+  long targetB = multiplier(atol(inParam2));
+  Serial.println(targetA);
+  Serial.println(targetB);
 
   motorA.setCurrentPosition(targetA);
   motorB.setCurrentPosition(targetB);
@@ -237,16 +240,16 @@ void exec_setPosition()
 
 void exec_changeLengthRelative()
 {
-  long lenA = multiplier(asLong(inParam1));
-  long lenB = multiplier(asLong(inParam2));
+  long lenA = multiplier(atol(inParam1));
+  long lenB = multiplier(atol(inParam2));
   
   changeLengthRelative(lenA, lenB);
 }  
 
 void exec_changeLength()
 {
-  float lenA = multiplier(asFloat(inParam1));
-  float lenB = multiplier(asFloat(inParam2));
+  float lenA = multiplier((float)atof(inParam1));
+  float lenB = multiplier((float)atof(inParam1));
   
   changeLength(lenA, lenB);
 }
@@ -254,9 +257,9 @@ void exec_changeLength()
 #ifdef VECTOR_LINES
 void exec_changeLengthDirect()
 {
-  float endA = multiplier(asFloat(inParam1));
-  float endB = multiplier(asFloat(inParam2));
-  int maxSegmentLength = asInt(inParam3);
+  float endA = multiplier((float)atof(inParam1));
+  float endB = multiplier((float)atof(inParam2));
+  int maxSegmentLength = atoi(inParam3);
 
   float startA = motorA.currentPosition();
   float startB = motorB.currentPosition();
@@ -308,7 +311,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     reportingPosition = false;
     float deltaX = c2x-c1x;    // distance each must move (signed)
     float deltaY = c2y-c1y;
-    float totalDistance = sqrt(sq(deltaX) + sq(deltaY));
+//    float totalDistance = sqrt(sq(deltaX) + sq(deltaY));
 
     int linesegs = 1;            // assume at least 1 line segment will get us there.
     if (abs(deltaX) > abs(deltaY))

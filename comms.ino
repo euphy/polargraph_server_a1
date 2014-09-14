@@ -102,21 +102,25 @@ boolean comms_waitForNextCommand(char *buf)
   idleTime = millis();
   lastOperationTime = millis();
   lastInteractionTime = lastOperationTime;
+#ifdef DEBUG_COMMS
   Serial.print(F("xbuf: "));
   Serial.println(buf);
+#endif
   return true;
 }
 
 void comms_parseAndExecuteCommand(char *inS)
 {
+#ifdef DEBUG_COMMS
   Serial.print("3inS: ");
   Serial.println(inS);
+#endif
 
   boolean commandParsed = comms_parseCommand(inS);
   if (commandParsed)
   {
     impl_processCommand(lastCommand);
-    inS = "";
+    for (int i = 0; i<INLENGTH; i++) { inS[i] = 0; }  
     commandConfirmed = false;
     comms_ready();
   }
@@ -133,21 +137,24 @@ void comms_parseAndExecuteCommand(char *inS)
 
 boolean comms_parseCommand(char *inS)
 {
+#ifdef DEBUG_COMMS
   Serial.print(F("1inS: "));
   Serial.println(inS);
+#endif
   // strstr returns a pointer to the location of ",END" in the incoming string (inS).
   char* sub = strstr(inS, CMD_END);
+#ifdef DEBUG_COMMS
   Serial.print(F("2inS: "));
   Serial.println(inS);
+#endif
   sub[strlen(CMD_END)] = 0; // null terminate it directly after the ",END"
+#ifdef DEBUG_COMMS
   Serial.print(F("4inS: "));
   Serial.println(inS);
-
   Serial.print(F("2Sub: "));
   Serial.println(sub);
-  
-  
   Serial.println(strcmp(sub, CMD_END));
+#endif
   if (strcmp(sub, CMD_END) == 0) 
   {
     comms_extractParams(inS);
@@ -163,6 +170,7 @@ void comms_extractParams(char* inS)
   strcpy(in, inS);
   char * param;
   
+#ifdef DEBUG_COMMS
   Serial.print(F("InS: "));
   Serial.print(inS);
   Serial.println("...");
@@ -170,7 +178,7 @@ void comms_extractParams(char* inS)
   Serial.print(F("In: "));
   Serial.print(in);
   Serial.println("...");
-  
+#endif  
   int paramNumber = 0;
   param = strtok(in, COMMA);
   while (param != NULL) 
@@ -197,8 +205,10 @@ void comms_extractParams(char* inS)
       }
       param = strtok(NULL, COMMA);
       paramNumber++;
-//      Serial.print(F("P: "));
-//      Serial.println(param);
+#ifdef DEBUG_COMMS
+      Serial.print(F("P: "));
+      Serial.println(param);
+#endif
   }
 
   inNoOfParams = paramNumber;
@@ -220,28 +230,28 @@ void comms_extractParams(char* inS)
 }
 
 
-long asLong(String inParam)
-{
-  char paramChar[inParam.length() + 1];
-  return atol(paramChar);
-}
-int asInt(String inParam)
-{
-  char paramChar[inParam.length() + 1];
-  inParam.toCharArray(paramChar, inParam.length() + 1);
-  return atoi(paramChar);
-}
-byte asByte(String inParam)
-{
-  int i = asInt(inParam);
-  return (byte) i;
-}
-float asFloat(String inParam)
-{
-  char paramChar[inParam.length() + 1];
-  inParam.toCharArray(paramChar, inParam.length() + 1);
-  return atof(paramChar);
-}
+//long asLong(String inParam)
+//{
+//  char paramChar[inParam.length() + 1];
+//  return atol(paramChar);
+//}
+//int asInt(String inParam)
+//{
+//  char paramChar[inParam.length() + 1];
+//  inParam.toCharArray(paramChar, inParam.length() + 1);
+//  return atoi(paramChar);
+//}
+//byte asByte(String inParam)
+//{
+//  int i = asInt(inParam);
+//  return (byte) i;
+//}
+//float asFloat(String inParam)
+//{
+//  char paramChar[inParam.length() + 1];
+//  inParam.toCharArray(paramChar, inParam.length() + 1);
+//  return atof(paramChar);
+//}
 
 void comms_ready()
 {

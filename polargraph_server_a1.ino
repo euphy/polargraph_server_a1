@@ -220,6 +220,9 @@ void setup()
   float startLength = ((float) startLengthMM / (float) mmPerRev) * (float) motorStepsPerRev;
   motorA.setCurrentPosition(startLength);
   motorB.setCurrentPosition(startLength);
+  for (int i = 0; i<INLENGTH; i++) {
+    lastCommand[i] = 0;
+  }    
   comms_ready();
 
 #ifdef PENLIFT
@@ -233,9 +236,11 @@ void loop()
 {
   if (comms_waitForNextCommand(lastCommand)) 
   {
+#ifdef DEBUG_COMMS    
     Serial.print(F("Last comm: "));
     Serial.print(lastCommand);
     Serial.println(F("..."));
+#endif
     comms_parseAndExecuteCommand(lastCommand);
   }
 }
