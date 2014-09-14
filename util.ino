@@ -46,7 +46,7 @@ void changeLength(long tAl, long tBl)
 //  Serial.println("changeLenth-float");
   lastOperationTime = millis();
 
-  impl_transform(tA,tB);
+//  impl_transform(tA,tB);
   
   float currSpeedA = motorA.speed();
   float currSpeedB = motorB.speed();
@@ -189,7 +189,7 @@ void reportPosition()
 {
   if (reportingPosition)
   {
-    Serial.print(OUT_CMD_SYNC);
+    Serial.print(OUT_CMD_SYNC_STR);
     Serial.print(divider(motorA.currentPosition()));
     Serial.print(COMMA);
     Serial.print(divider(motorB.currentPosition()));
@@ -240,31 +240,4 @@ long getCartesianY(long cX, float aPos) {
   long calcY = long(sqrt(pow(aPos,2)-pow(cX,2)));
   return calcY;
 }
-
-/*
-Calculating CRCs.  Incoming commands have these appended as a way
-to check quality.
-http://www.excamera.com/sphinx/article-crc.html
-*/
-unsigned long crc_update(unsigned long crc, byte data)
-{
-    byte tbl_idx;
-    tbl_idx = crc ^ (data >> (0 * 4));
-    crc = pgm_read_dword_near(crc_table + (tbl_idx & 0x0f)) ^ (crc >> 4);
-    tbl_idx = crc ^ (data >> (1 * 4));
-    crc = pgm_read_dword_near(crc_table + (tbl_idx & 0x0f)) ^ (crc >> 4);
-    return crc;
-}
-
-unsigned long crc_string(String s)
-{
-  unsigned long crc = ~0L;
-  for (int i = 0; i < s.length(); i++)
-  {
-    crc = crc_update(crc, s.charAt(i));
-  }
-  crc = ~crc;
-  return crc;
-}
-
 

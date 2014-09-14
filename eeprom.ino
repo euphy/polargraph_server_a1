@@ -42,8 +42,7 @@ void eeprom_loadMachineSize()
   {
     machineWidth = defaultMachineWidth;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("width:"));
+  Serial.print(F("Loaded width:"));
   Serial.println(machineWidth);
   
   EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, machineHeight);
@@ -51,8 +50,7 @@ void eeprom_loadMachineSize()
   {
     machineHeight = defaultMachineHeight;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("height:"));
+  Serial.print(F("Loaded height:"));
   Serial.println(machineHeight);
 }
 
@@ -63,8 +61,7 @@ void eeprom_loadSpoolSpec()
   {
     mmPerRev = defaultMmPerRev;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("mmPerRev:"));
+  Serial.print(F("Loaded mmPerRev:"));
   Serial.println(mmPerRev);
 
   EEPROM_readAnything(EEPROM_MACHINE_STEPS_PER_REV, motorStepsPerRev);
@@ -72,8 +69,7 @@ void eeprom_loadSpoolSpec()
   {
     motorStepsPerRev = defaultStepsPerRev;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("steps per rev:"));
+  Serial.print(F("Loaded steps per rev:"));
   Serial.println(motorStepsPerRev);
 }  
 
@@ -84,8 +80,7 @@ void eeprom_loadPenLiftRange()
   {
     downPosition = DEFAULT_DOWN_POSITION;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("down pos:"));
+  Serial.print(F("Loaded down pos:"));
   Serial.println(downPosition);
 
   EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
@@ -93,8 +88,7 @@ void eeprom_loadPenLiftRange()
   {
     upPosition = DEFAULT_UP_POSITION;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("up pos:"));
+  Serial.print(F("Loaded up pos:"));
   Serial.println(upPosition);
 }  
 
@@ -105,8 +99,7 @@ void eeprom_loadStepMultiplier()
   {
     stepMultiplier = defaultStepMultiplier;
   }
-  Serial.print(F("Loaded "));
-  Serial.print(F("step multiplier:"));
+  Serial.print(F("Loaded step multiplier:"));
   Serial.println(stepMultiplier);  
 }  
 
@@ -146,20 +139,16 @@ void eeprom_loadMachineSpecFromEeprom()
   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
 
-  Serial.print(F("Recalc "));
-  Serial.print(F("mmPerStep ("));
+  Serial.print(F("Recalc mmPerStep ("));
   Serial.print(mmPerStep);
   Serial.print(F("), stepsPerMM ("));
   Serial.print(stepsPerMM);
-  Serial.print(F(")"));
-  Serial.println();
+  Serial.println(F(")"));
 
   pageWidth = machineWidth * stepsPerMM;
-  Serial.print(F("Recalc "));
-  Serial.print(F("pageWidth in steps ("));
+  Serial.print(F("Recalc pageWidth in steps ("));
   Serial.print(pageWidth);
-  Serial.print(F(")"));
-  Serial.println();
+  Serial.println(F(")"));
   pageHeight = machineHeight * stepsPerMM;
 
   Serial.print(F("Recalc "));

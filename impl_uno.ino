@@ -14,7 +14,14 @@ void impl_processCommand(String com)
 }
 
 void impl_runBackgroundProcesses()
-{}
+{
+  long motorCutoffTime = millis() - lastOperationTime;
+  if ((automaticPowerDown) && (powerIsOn) && (motorCutoffTime > motorIdleTimeBeforePowerDown))
+  {
+    Serial.println(F("MSG_INFO_STRPowering down."));
+    impl_releaseMotors();
+  }
+}
 
 void impl_loadMachineSpecFromEeprom()
 {}
@@ -35,6 +42,9 @@ void impl_executeCommand(String &com)
 
 void impl_engageMotors()
 {
+  motorA.enableOutputs();
+  motorB.enableOutputs();
+  powerIsOn = true;
   motorA.runToNewPosition(motorA.currentPosition()+4);
   motorB.runToNewPosition(motorB.currentPosition()+4);
   motorA.runToNewPosition(motorA.currentPosition()-4);
@@ -43,9 +53,14 @@ void impl_engageMotors()
 
 void impl_releaseMotors()
 {
+  motorA.disableOutputs();
+  motorB.disableOutputs();  
+#ifdef PENLIFT 
   penlift_penUp();
+#endif
+  powerIsOn = false;  
 }
-
-void impl_transform(float &tA, float &tB)
-{ 
-}
+//
+//void impl_transform(float &tA, float &tB)
+//{ 
+//}
