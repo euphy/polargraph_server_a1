@@ -230,29 +230,6 @@ void comms_extractParams(char* inS)
 }
 
 
-//long asLong(String inParam)
-//{
-//  char paramChar[inParam.length() + 1];
-//  return atol(paramChar);
-//}
-//int asInt(String inParam)
-//{
-//  char paramChar[inParam.length() + 1];
-//  inParam.toCharArray(paramChar, inParam.length() + 1);
-//  return atoi(paramChar);
-//}
-//byte asByte(String inParam)
-//{
-//  int i = asInt(inParam);
-//  return (byte) i;
-//}
-//float asFloat(String inParam)
-//{
-//  char paramChar[inParam.length() + 1];
-//  inParam.toCharArray(paramChar, inParam.length() + 1);
-//  return atof(paramChar);
-//}
-
 void comms_ready()
 {
   Serial.println(F(READY_STR));

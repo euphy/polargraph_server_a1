@@ -222,14 +222,8 @@ void exec_changePenWidth()
 
 void exec_setPosition()
 {
-  Serial.print(F("Set pos: "));
-  Serial.println(inParam1);
-  Serial.println(inParam2);
   long targetA = multiplier(atol(inParam1));
   long targetB = multiplier(atol(inParam2));
-  Serial.println(targetA);
-  Serial.println(targetB);
-
   motorA.setCurrentPosition(targetA);
   motorB.setCurrentPosition(targetB);
   
