@@ -43,6 +43,7 @@ Comment the lines below in or out to control what gets compiled.
 
 // Specify what kind of motor driver you are using
 // ===============================================
+// Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
 #define ADAFRUIT_MOTORSHIELD_V2
 //#define ADAFRUIT_MOTORSHIELD_V1
