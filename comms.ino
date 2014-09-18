@@ -171,49 +171,60 @@ void comms_extractParams(char* inS)
   char * param;
   
 #ifdef DEBUG_COMMS
-  Serial.print(F("InS: "));
-  Serial.print(inS);
-  Serial.println("...");
-
   Serial.print(F("In: "));
   Serial.print(in);
   Serial.println("...");
 #endif  
-  int paramNumber = 0;
+  byte paramNumber = 0;
   param = strtok(in, COMMA);
-  while (param != NULL) 
-  {
-      switch(paramNumber) 
-      {
-        case 0:
-          strcpy(inCmd, param);
-          break;
-        case 1:
-          strcpy(inParam1, param);
-          break;
-        case 2:
-          strcpy(inParam2, param);
-          break;
-        case 3:
-          strcpy(inParam3, param);
-          break;
-        case 4:
-          strcpy(inParam4, param);
-          break;
-        default:
-          break;
+  
+  inParam1[0] = 0;
+  inParam2[0] = 0;
+  inParam3[0] = 0;
+  inParam4[0] = 0;
+  
+  for (byte i=0; i<6; i++) {
+      if (i == 0) {
+        strcpy(inCmd, param);
       }
-      param = strtok(NULL, COMMA);
-      paramNumber++;
+      else {
+        param = strtok(NULL, COMMA);
+        if (param != NULL) {
+          if (strstr(CMD_END, param) == NULL) {
+            // It's not null AND it wasn't 'END' either
+            paramNumber++;
+          }
+        }
+        
+        switch(i)
+        {
+          case 1:
+            if (param != NULL) strcpy(inParam1, param);
+            break;
+          case 2:
+            if (param != NULL) strcpy(inParam2, param);
+            break;
+          case 3:
+            if (param != NULL) strcpy(inParam3, param);
+            break;
+          case 4:
+            if (param != NULL) strcpy(inParam4, param);
+            break;
+          default:
+            break;
+        }
+      }
 #ifdef DEBUG_COMMS
       Serial.print(F("P: "));
+      Serial.print(i);
+      Serial.print(F("-"));
+      Serial.print(paramNumber);
+      Serial.print(F(":"));
       Serial.println(param);
 #endif
   }
 
   inNoOfParams = paramNumber;
-//  Serial.print(F("Ps:"));
-//  Serial.println(inNoOfParams);  
 
 #ifdef DEBUG_COMMS
     Serial.print(F("Command:"));
@@ -226,6 +237,8 @@ void comms_extractParams(char* inS)
     Serial.print(inParam3);
     Serial.print(F(", p4:"));
     Serial.println(inParam4);
+    Serial.print(F("Params:"));
+    Serial.println(inNoOfParams);  
 #endif
 }
 
@@ -244,7 +257,7 @@ void comms_requestResend()
 }
 void comms_unrecognisedCommand(String &com)
 {
-  Serial.print(F(MSG_E_STR));
+  Serial.print(MSG_E_STR);
   Serial.print(com);
   Serial.println(F(" not recognised."));
 }  

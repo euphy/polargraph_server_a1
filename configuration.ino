@@ -21,12 +21,12 @@ Comment out the blocks of code you don't need.
 // 1. Adafruit motorshield
 
 // Using Adafruit Motorshield V2? Comment out this one line underneath.
-//#include <AFMotor.h>
+#include <AFMotor.h>
 
 // Using Adafruit Motorshield V1? Comment out the three INCLUDE lines below.
-#include <Wire.h>
-#include <Adafruit_MotorShield.h>
-#include "utility/Adafruit_PWMServoDriver.h"
+//#include <Wire.h>
+//#include <Adafruit_MotorShield.h>
+//#include "utility/Adafruit_PWMServoDriver.h"
 
 #ifdef ADAFRUIT_MOTORSHIELD_V1
 const int stepType = INTERLEAVE;

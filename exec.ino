@@ -260,7 +260,8 @@ void exec_changeLengthDirect()
 
   if (endA < 20 || endB < 20 || endA > getMaxLength() || endB > getMaxLength())
   {
-    Serial.println(F("MSG_E_STRThis point falls outside the area of this machine. Skipping it."));
+    Serial.print(MSG_E_STR);
+    Serial.println(F("This point falls outside the area of this machine. Skipping it."));
   }
   else
   {
@@ -365,8 +366,8 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   }
   else
   {
-    
-    Serial.println(F("MSG_ERROR_STRLine is not on the page. Skipping it."));
+    Serial.print(MSG_E_STR);
+    Serial.println(F("Line is not on the page. Skipping it."));
   }
 //  outputAvailableMemory();
 }

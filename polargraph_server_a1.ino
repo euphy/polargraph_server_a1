@@ -45,8 +45,8 @@ Comment the lines below in or out to control what gets compiled.
 // ===============================================
 // Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-#define ADAFRUIT_MOTORSHIELD_V2
-//#define ADAFRUIT_MOTORSHIELD_V1
+//#define ADAFRUIT_MOTORSHIELD_V2
+#define ADAFRUIT_MOTORSHIELD_V1
 
 
 #include <AccelStepper.h>
@@ -58,7 +58,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.10";
+const String FIRMWARE_VERSION_NO = "1.10.2";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
@@ -132,6 +132,7 @@ static char inParam1[14];
 static char inParam2[14];
 static char inParam3[14];
 static char inParam4[14];
+//static char inParams[4][14];
 
 byte inNoOfParams;
 
@@ -167,9 +168,9 @@ static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 #define DRAWING_STR "DRAWING"
 #define OUT_CMD_SYNC_STR "SYNC,"
 
-#define MSG_E_STR "MSG,E,"
-#define MSG_I_STR "MSG,I,"
-#define MSG_D_STR "MSG,D,"
+char MSG_E_STR[] = "MSG,E,";
+char MSG_I_STR[] = "MSG,I,";
+char MSG_D_STR[] = "MSG,D,";
 
 const static char COMMA[] = ",";
 const static char CMD_END[] = ",END";
