@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 EEPROM.
 
@@ -42,7 +42,7 @@ void eeprom_loadMachineSize()
   {
     machineWidth = defaultMachineWidth;
   }
-  Serial.print(F("Loaded machine width:"));
+  Serial.print(F("Loaded width:"));
   Serial.println(machineWidth);
   
   EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, machineHeight);
@@ -50,7 +50,7 @@ void eeprom_loadMachineSize()
   {
     machineHeight = defaultMachineHeight;
   }
-  Serial.print(F("Loaded machine height:"));
+  Serial.print(F("Loaded height:"));
   Serial.println(machineHeight);
 }
 
@@ -61,7 +61,7 @@ void eeprom_loadSpoolSpec()
   {
     mmPerRev = defaultMmPerRev;
   }
-  Serial.print(F("Loaded mm per rev:"));
+  Serial.print(F("Loaded mmPerRev:"));
   Serial.println(mmPerRev);
 
   EEPROM_readAnything(EEPROM_MACHINE_STEPS_PER_REV, motorStepsPerRev);
@@ -69,7 +69,7 @@ void eeprom_loadSpoolSpec()
   {
     motorStepsPerRev = defaultStepsPerRev;
   }
-  Serial.print(F("Loaded motor steps per rev:"));
+  Serial.print(F("Loaded steps per rev:"));
   Serial.println(motorStepsPerRev);
 }  
 
@@ -99,7 +99,7 @@ void eeprom_loadStepMultiplier()
   {
     stepMultiplier = defaultStepMultiplier;
   }
-  Serial.print(F("Loaded motor step multiplier:"));
+  Serial.print(F("Loaded step multiplier:"));
   Serial.println(stepMultiplier);  
 }  
 
@@ -138,21 +138,21 @@ void eeprom_loadMachineSpecFromEeprom()
 
   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
-  
+
   Serial.print(F("Recalc mmPerStep ("));
   Serial.print(mmPerStep);
   Serial.print(F("), stepsPerMM ("));
   Serial.print(stepsPerMM);
-  Serial.print(F(")"));
-  Serial.println();
+  Serial.println(F(")"));
 
   pageWidth = machineWidth * stepsPerMM;
   Serial.print(F("Recalc pageWidth in steps ("));
   Serial.print(pageWidth);
-  Serial.print(F(")"));
-  Serial.println();
+  Serial.println(F(")"));
   pageHeight = machineHeight * stepsPerMM;
-  Serial.print(F("Recalc pageHeight in steps ("));
+
+  Serial.print(F("Recalc "));
+  Serial.print(F("pageHeight in steps ("));
   Serial.print(pageHeight);
   Serial.print(F(")"));
   Serial.println();

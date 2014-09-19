@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 The program has a core part that consists of the following files:
 
@@ -33,6 +33,7 @@ Comment the lines below in or out to control what gets compiled.
 // Turn on some debugging code
 // ===========================
 //#define DEBUG
+//#define DEBUG_COMMS
 
 // Program features
 // ================
@@ -42,6 +43,7 @@ Comment the lines below in or out to control what gets compiled.
 
 // Specify what kind of motor driver you are using
 // ===============================================
+// Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
 #define ADAFRUIT_MOTORSHIELD_V2
 //#define ADAFRUIT_MOTORSHIELD_V1
@@ -56,17 +58,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.9";
-
-// for working out CRCs
-static PROGMEM prog_uint32_t crc_table[16] = {
-    0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
-    0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
-    0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
-    0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
-};
-
-static boolean usingCrc = false;
+const String FIRMWARE_VERSION_NO = "1.10.2";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
@@ -98,12 +90,6 @@ boolean isPenUp = false;
 int motorStepsPerRev = 800;//UNL2003 = 4076
 float mmPerRev = 95;//UNL2003 = 25
 byte stepMultiplier = 1;
-
-static float translateX = 0.0;
-static float translateY = 0.0;
-static float scaleX = 1.0;
-static float scaleY = 1.0;
-static int rotateTransform = 0;
 
 static int machineWidth = 650;
 static int machineHeight = 800;
@@ -175,18 +161,23 @@ extern AccelStepper motorB;
 
 boolean currentlyRunning = true;
 
-static String inCmd = "                                                  ";
-static String inParam1 = "              ";
-static String inParam2 = "              ";
-static String inParam3 = "              ";
-static String inParam4 = "              ";
+static char inCmd[10];
+static char inParam1[14];
+static char inParam2[14];
+static char inParam3[14];
+static char inParam4[14];
+//static char inParams[4][14];
 
 byte inNoOfParams;
 
-int rebroadcastReadyInterval = 5000L;
+char lastCommand[INLENGTH+1];
+boolean commandConfirmed = false;
+
+int rebroadcastReadyInterval = 5000;
 long lastOperationTime = 0L;
 long motorIdleTimeBeforePowerDown = 600000L;
 boolean automaticPowerDown = false;
+boolean powerIsOn = false;
 
 long lastInteractionTime = 0L;
 
@@ -199,49 +190,34 @@ const static byte DIR_SE = 2;
 const static byte DIR_SW = 3;
 const static byte DIR_NW = 4;
 
-const static byte DIR_N = 5;
-const static byte DIR_E = 6;
-const static byte DIR_S = 7;
-const static byte DIR_W = 8;
 static int globalDrawDirection = DIR_NW;
 
 const static byte DIR_MODE_AUTO = 1;
 const static byte DIR_MODE_PRESET = 2;
-const static byte DIR_MODE_RANDOM = 3;
 static byte globalDrawDirectionMode = DIR_MODE_AUTO;
-
 #endif
 
-//static int currentRow = 0;
+#define READY_STR "READY"
+#define RESEND_STR "RESEND"
+#define DRAWING_STR "DRAWING"
+#define OUT_CMD_SYNC_STR "SYNC,"
 
-const String READY = "READY";
-const String RESEND = "RESEND";
-const String DRAWING = "DRAWING";
-const String OUT_CMD_CARTESIAN = "CARTESIAN,";
-const String OUT_CMD_SYNC = "SYNC,";
+char MSG_E_STR[] = "MSG,E,";
+char MSG_I_STR[] = "MSG,I,";
+char MSG_D_STR[] = "MSG,D,";
 
-const String MSG = "MSG,";
-const String MSG_ERROR = "E,";
-const String MSG_INFO = "I,";
-const String MSG_DEBUG = "D,";
-
-static String readyString = READY;
-
-String lastCommand = "";
-boolean commandConfirmed = false;
-
-const static String COMMA = ",";
-const static String CMD_END = ",END";
+const static char COMMA[] = ",";
+const static char CMD_END[] = ",END";
 const static String CMD_CHANGELENGTH = "C01";
 const static String CMD_CHANGEPENWIDTH = "C02";
-const static String CMD_CHANGEMOTORSPEED = "C03";
-const static String CMD_CHANGEMOTORACCEL = "C04";
+//const static String CMD_CHANGEMOTORSPEED = "C03";
+//const static String CMD_CHANGEMOTORACCEL = "C04";
 #ifdef PIXEL_DRAWING
 const static String CMD_DRAWPIXEL = "C05";
 const static String CMD_DRAWSCRIBBLEPIXEL = "C06";
 //const static String CMD_DRAWRECT = "C07";
 const static String CMD_CHANGEDRAWINGDIRECTION = "C08";
-const static String CMD_TESTPATTERN = "C10";
+//const static String CMD_TESTPATTERN = "C10";
 const static String CMD_TESTPENWIDTHSQUARE = "C11";
 #endif
 const static String CMD_SETPOSITION = "C09";
@@ -254,7 +230,7 @@ const static String CMD_SETPENLIFTRANGE = "C45";
 const static String CMD_CHANGELENGTHDIRECT = "C17";
 #endif
 const static String CMD_SETMACHINESIZE = "C24";
-const static String CMD_SETMACHINENAME = "C25";
+//const static String CMD_SETMACHINENAME = "C25";
 const static String CMD_GETMACHINEDETAILS = "C26";
 const static String CMD_RESETEEPROM = "C27";
 const static String CMD_SETMACHINEMMPERREV = "C29";
@@ -266,7 +242,7 @@ const static String CMD_SETMACHINESTEPMULTIPLIER = "C37";
 void setup() 
 {
   Serial.begin(57600);           // set up Serial library at 57600 bps
-  Serial.print(F("POLARGRAPH ON!"));
+  Serial.print("POLARGRAPH ON!");
   Serial.println();
   configuration_motorSetup();
   eeprom_loadMachineSpecFromEeprom();
@@ -280,8 +256,10 @@ void setup()
   float startLength = ((float) startLengthMM / (float) mmPerRev) * (float) motorStepsPerRev;
   motorA.setCurrentPosition(startLength);
   motorB.setCurrentPosition(startLength);
-  readyString = READY;
-  comms_establishContact();
+  for (int i = 0; i<INLENGTH; i++) {
+    lastCommand[i] = 0;
+  }    
+  comms_ready();
 
 #ifdef PENLIFT
   penlift_penUp();
@@ -292,8 +270,15 @@ void setup()
 
 void loop()
 {
-  lastCommand = comms_waitForNextCommand();
-  comms_parseAndExecuteCommand(lastCommand);
+  if (comms_waitForNextCommand(lastCommand)) 
+  {
+#ifdef DEBUG_COMMS    
+    Serial.print(F("Last comm: "));
+    Serial.print(lastCommand);
+    Serial.println(F("..."));
+#endif
+    comms_parseAndExecuteCommand(lastCommand);
+  }
 }
 
 

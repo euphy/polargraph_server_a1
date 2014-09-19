@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 Penlift.
 
@@ -56,7 +56,7 @@ void penlift_penUp()
   {
 //    Serial.print("Penup with params");
     int positionToMoveFrom = isPenUp ? upPosition : downPosition;
-    upPosition = asInt(inParam1);
+    upPosition = atoi(inParam1);
     penlift_movePen(positionToMoveFrom, upPosition, penLiftSpeed);
   }
   else
@@ -76,7 +76,7 @@ void penlift_penDown()
   if (inNoOfParams > 1)
   {
     int positionToMoveFrom = isPenUp ? upPosition : downPosition;
-    downPosition = asInt(inParam1);
+    downPosition = atoi(inParam1);
     penlift_movePen(positionToMoveFrom, downPosition, penLiftSpeed);
   }
   else

@@ -3,7 +3,7 @@
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
-*  http://code.google.com/p/polargraph/
+*  https://github.com/euphy/polargraph_server_a1
 
 Comms.
 
@@ -13,54 +13,149 @@ it contains methods for reading commands from the serial port.
 
 */
 
-String comms_waitForNextCommand()
+boolean comms_waitForNextCommand(char *buf)
 {
   // send ready
   // wait for instruction
-  int idleTime = millis();
-  
-  // do this bit until we get a command confirmed
-  // idle
-  String inS = "";
+  long idleTime = millis();
+  int bufPos = 0;
+  for (int i = 0; i<INLENGTH; i++) {
+    buf[i] = 0;
+  }  
+  long lastRxTime = 0L;
 
-  // loop while there's no commands coming in
-  while (inS.length() == 0)
+  // loop while there's there isn't a terminated command.
+  // (Note this might mean characters ARE arriving, but just
+  //  that the command hasn't been finished yet.)
+  boolean terminated = false;
+  while (!terminated)
   {
+#ifdef DEBUG_COMMS    
+    Serial.print(F("."));
+#endif    
+    long timeSince = millis() - lastRxTime;
+    
+    // If the buffer is being filled, but hasn't received a new char in less than 100ms,
+    // just cancel it. It's probably just junk.
+    if (bufPos != 0 && timeSince > 100)
+    {
+#ifdef DEBUG_COMMS
+      Serial.print(F("Timed out:"));
+      Serial.println(timeSince);
+#endif
+      // Clear the buffer and reset the position if it took too long
+      for (int i = 0; i<INLENGTH; i++) {
+        buf[i] = 0;
+      }
+      bufPos = 0;
+    }
+    
+    // idle time is mostly spent in this loop.
     impl_runBackgroundProcesses();
-    // idle time is spent in this loop.
-    int timeSince = millis() - idleTime;
+    timeSince = millis() - idleTime;
     if (timeSince > rebroadcastReadyInterval)
     {
       // issue a READY every 5000ms of idling
+#ifdef DEBUG_COMMS      
+      Serial.println("");
+#endif
       comms_ready();
       idleTime = millis();
     }
     
-    // and now read the command if one exists
-    // this also sets usingCrc AND commandConfirmed
-    // to true or false
-    inS = comms_readCommand();
-
-    // if it's using the CRC check, then confirmation is easy
-    if (usingCrc && !commandConfirmed)
+    // And now read the command if one exists.
+    if (Serial.available() > 0)
     {
-      comms_requestResend();
-      inS = "";
+      // Get the char
+      char ch = Serial.read();
+#ifdef DEBUG_COMMS
+      Serial.print(F("ch: "));
+      Serial.println(ch);
+#endif
+      
+      // look at it, if it's a terminator, then lets terminate the string
+      if (ch == INTERMINATOR) {
+        buf[bufPos] = 0; // null terminate the string
+        terminated = true;
+#ifdef DEBUG_COMMS
+        Serial.println(F("Term'd"));
+#endif
+        for (int i = bufPos; i<INLENGTH-1; i++) {
+          buf[i] = 0;
+        }
+        
+      } else {
+        // otherwise, just add it into the buffer
+        buf[bufPos] = ch;
+        bufPos++;
+      }
+#ifdef DEBUG_COMMS
+      Serial.print(F("buf: "));
+      Serial.println(buf);
+      Serial.print(F("Bufpos: "));
+      Serial.println(bufPos);
+#endif
+      lastRxTime = millis();
     }
   }
-  
-  
-  // CRC was ok, or we aren't using one
+
   idleTime = millis();
   lastOperationTime = millis();
   lastInteractionTime = lastOperationTime;
-
-  return inS;
+#ifdef DEBUG_COMMS
+  Serial.print(F("xbuf: "));
+  Serial.println(buf);
+#endif
+  return true;
 }
 
-boolean comms_parseCommand(String inS)
+void comms_parseAndExecuteCommand(char *inS)
 {
-  if (inS.endsWith(CMD_END))
+#ifdef DEBUG_COMMS
+  Serial.print("3inS: ");
+  Serial.println(inS);
+#endif
+
+  boolean commandParsed = comms_parseCommand(inS);
+  if (commandParsed)
+  {
+    impl_processCommand(lastCommand);
+    for (int i = 0; i<INLENGTH; i++) { inS[i] = 0; }  
+    commandConfirmed = false;
+    comms_ready();
+  }
+  else
+  {
+    Serial.print(MSG_E_STR);
+    Serial.print(F("Comm ("));
+    Serial.print(inS);
+    Serial.println(F(") not parsed."));
+  }
+  inNoOfParams = 0;
+  
+}
+
+boolean comms_parseCommand(char *inS)
+{
+#ifdef DEBUG_COMMS
+  Serial.print(F("1inS: "));
+  Serial.println(inS);
+#endif
+  // strstr returns a pointer to the location of ",END" in the incoming string (inS).
+  char* sub = strstr(inS, CMD_END);
+#ifdef DEBUG_COMMS
+  Serial.print(F("2inS: "));
+  Serial.println(inS);
+#endif
+  sub[strlen(CMD_END)] = 0; // null terminate it directly after the ",END"
+#ifdef DEBUG_COMMS
+  Serial.print(F("4inS: "));
+  Serial.println(inS);
+  Serial.print(F("2Sub: "));
+  Serial.println(sub);
+  Serial.println(strcmp(sub, CMD_END));
+#endif
+  if (strcmp(sub, CMD_END) == 0) 
   {
     comms_extractParams(inS);
     return true;
@@ -69,176 +164,100 @@ boolean comms_parseCommand(String inS)
     return false;
 }  
 
-String comms_readCommand()
+void comms_extractParams(char* inS) 
 {
-  // check if data has been sent from the computer:
-  char inString[INLENGTH+1];
-  int inCount = 0;
-  while (Serial.available() > 0)
-  {
-    char ch = Serial.read();       // get it
-    delay(1);
-    inString[inCount] = ch;
-    if (ch == INTERMINATOR)
-    {
-      Serial.flush();
-      break;
-    }
-    inCount++;
-  }
-  inString[inCount] = 0;                     // null terminate the string
-  String inS = inString;
+  char in[strlen(inS)];
+  strcpy(in, inS);
+  char * param;
   
-  // check the CRC for this command
-  // and set commandConfirmed true or false
-  int colonPos = inS.lastIndexOf(":");
-  if (colonPos != -1)
-  {
-    usingCrc = true;
-    String cs = inS.substring(colonPos+1);
-    long checksum = asLong(cs);
-    inS = inS.substring(0, colonPos);
-    
-    long calcCrc = crc_string(inS);
-    
-    if (calcCrc == checksum)
-    {
-      commandConfirmed = true;
-    }
-    else
-    {
-      Serial.print(F("Rcd: "));
-      Serial.println(inString);
-      Serial.print(F("Bad Sum:"));
-      Serial.println(calcCrc);
-      commandConfirmed = false;
-    }
-
-  }
-  else
-  {
-    // then fall back and do the ACK - no action here
-    usingCrc = false;
-    commandConfirmed = false;
-  }
-
-  return inS;
-}
-
-void comms_parseAndExecuteCommand(String &in)
-{
-  boolean commandParsed = comms_parseCommand(in);
-  if (commandParsed)
-  {
-    impl_processCommand(lastCommand);
-    in = "";
-    commandConfirmed = false;
-    comms_ready();
-  }
-  else
-  {
-    Serial.print(F("Comm ("));
-    Serial.print(in);
-    Serial.println(F(") not parsed."));
-  }
-  inNoOfParams = 0;
+#ifdef DEBUG_COMMS
+  Serial.print(F("In: "));
+  Serial.print(in);
+  Serial.println("...");
+#endif  
+  byte paramNumber = 0;
+  param = strtok(in, COMMA);
   
-}
-
-
-void comms_extractParams(String inS) {
+  inParam1[0] = 0;
+  inParam2[0] = 0;
+  inParam3[0] = 0;
+  inParam4[0] = 0;
   
-  // get number of parameters
-  // by counting commas
-  int length = inS.length();
-  
-  int startPos = 0;
-  int paramNumber = 0;
-  for (int i = 0; i < length; i++) {
-    if (inS.charAt(i) == ',') {
-      String param = inS.substring(startPos, i);
-      startPos = i+1;
-      
-      switch(paramNumber) {
-        case 0:
-          inCmd = param;
-          break;
-        case 1:
-          inParam1 = param;
-          break;
-        case 2:
-          inParam2 = param;
-          break;
-        case 3:
-          inParam3 = param;
-          break;
-        case 4:
-          inParam4 = param;
-          break;
-        default:
-          break;
+  for (byte i=0; i<6; i++) {
+      if (i == 0) {
+        strcpy(inCmd, param);
       }
-      paramNumber++;
-    }
+      else {
+        param = strtok(NULL, COMMA);
+        if (param != NULL) {
+          if (strstr(CMD_END, param) == NULL) {
+            // It's not null AND it wasn't 'END' either
+            paramNumber++;
+          }
+        }
+        
+        switch(i)
+        {
+          case 1:
+            if (param != NULL) strcpy(inParam1, param);
+            break;
+          case 2:
+            if (param != NULL) strcpy(inParam2, param);
+            break;
+          case 3:
+            if (param != NULL) strcpy(inParam3, param);
+            break;
+          case 4:
+            if (param != NULL) strcpy(inParam4, param);
+            break;
+          default:
+            break;
+        }
+      }
+#ifdef DEBUG_COMMS
+      Serial.print(F("P: "));
+      Serial.print(i);
+      Serial.print(F("-"));
+      Serial.print(paramNumber);
+      Serial.print(F(":"));
+      Serial.println(param);
+#endif
   }
+
   inNoOfParams = paramNumber;
-  
-//    Serial.print(F("Command:"));
-//    Serial.print(inCmd);
-//    Serial.print(F(", p1:"));
-//    Serial.print(inParam1);
-//    Serial.print(F(", p2:"));
-//    Serial.print(inParam2);
-//    Serial.print(F(", p3:"));
-//    Serial.print(inParam3);
-//    Serial.print(F(", p4:"));
-//    Serial.println(inParam4);
+
+#ifdef DEBUG_COMMS
+    Serial.print(F("Command:"));
+    Serial.print(inCmd);
+    Serial.print(F(", p1:"));
+    Serial.print(inParam1);
+    Serial.print(F(", p2:"));
+    Serial.print(inParam2);
+    Serial.print(F(", p3:"));
+    Serial.print(inParam3);
+    Serial.print(F(", p4:"));
+    Serial.println(inParam4);
+    Serial.print(F("Params:"));
+    Serial.println(inNoOfParams);  
+#endif
 }
 
 
-long asLong(String inParam)
-{
-  char paramChar[inParam.length() + 1];
-  inParam.toCharArray(paramChar, inParam.length() + 1);
-  return atol(paramChar);
-}
-int asInt(String inParam)
-{
-  char paramChar[inParam.length() + 1];
-  inParam.toCharArray(paramChar, inParam.length() + 1);
-  return atoi(paramChar);
-}
-byte asByte(String inParam)
-{
-  int i = asInt(inParam);
-  return (byte) i;
-}
-float asFloat(String inParam)
-{
-  char paramChar[inParam.length() + 1];
-  inParam.toCharArray(paramChar, inParam.length() + 1);
-  return atof(paramChar);
-}
-
-void comms_establishContact() 
-{
-  comms_ready();
-}
 void comms_ready()
 {
-  Serial.println(READY);
+  Serial.println(F(READY_STR));
 }
 void comms_drawing()
 {
-  Serial.println(DRAWING);
+  Serial.println(F(DRAWING_STR));
 }
 void comms_requestResend()
 {
-  Serial.println(RESEND);
+  Serial.println(F(RESEND_STR));
 }
 void comms_unrecognisedCommand(String &com)
 {
-  Serial.print(F("ERR,E,"));
+  Serial.print(MSG_E_STR);
   Serial.print(com);
   Serial.println(F(" not recognised."));
 }  
