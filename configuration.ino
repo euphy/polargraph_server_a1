@@ -20,13 +20,13 @@ Comment out the blocks of code you don't need.
 // =================================================================
 // 1. Adafruit motorshield
 
-// Using Adafruit Motorshield V2? Comment out this one line underneath.
-#include <AFMotor.h>
+// Using Adafruit Motorshield V2 or UNL2003? Comment out this one line underneath.
+//#include <AFMotor.h>
 
-// Using Adafruit Motorshield V1? Comment out the three INCLUDE lines below.
-//#include <Wire.h>
-//#include <Adafruit_MotorShield.h>
-//#include "utility/Adafruit_PWMServoDriver.h"
+// Using Adafruit Motorshield V1 or UNL2003? Comment out the three INCLUDE lines below.
+#include <Wire.h>
+#include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_PWMServoDriver.h"
 
 #ifdef ADAFRUIT_MOTORSHIELD_V1
 const int stepType = INTERLEAVE;
@@ -37,6 +37,9 @@ void forwarda() { afMotorA.onestep(FORWARD, stepType); }
 void backwarda() { afMotorA.onestep(BACKWARD, stepType); }
 void forwardb() { afMotorB.onestep(FORWARD, stepType); }
 void backwardb() { afMotorB.onestep(BACKWARD, stepType); }
+
+AccelStepper motorA(forwarda, backwarda);
+AccelStepper motorB(forwardb, backwardb);
 #endif
 
 #ifdef ADAFRUIT_MOTORSHIELD_V2
@@ -50,11 +53,17 @@ void forwarda() { afMotorA->onestep(FORWARD, stepType); }
 void backwarda() { afMotorA->onestep(BACKWARD, stepType); }
 void forwardb() { afMotorB->onestep(FORWARD, stepType); }
 void backwardb() { afMotorB->onestep(BACKWARD, stepType); }
-#endif
-
 
 AccelStepper motorA(forwarda, backwarda);
 AccelStepper motorB(forwardb, backwardb);
+#endif
+
+#ifdef UNL2003
+void forwarda() { motorA.move(FORWARD);motorA.run(); }
+void backwarda() { motorA.move(BACKWARD);motorA.run(); }
+void forwardb() { motorB.move(FORWARD);motorB.run(); }
+void backwardb() { motorB.move(BACKWARD);motorB.run(); }
+#endif
 
 void configuration_motorSetup()
 {
