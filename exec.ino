@@ -150,22 +150,23 @@ void exec_setPenLiftRange()
 {
   int down = atoi(inParam1);
   int up = atoi(inParam2);
-  
+
+#ifdef DEBUG_PENLIFT
   Serial.print(F("Down: "));
   Serial.println(down);
   Serial.print(F("Up: "));
   Serial.println(up);
-  
-  if (inNoOfParams == 4) 
+#endif 
+  if (inNoOfParams == 3) 
   {
-    // 4 params (C45,<downpos>,<uppos>,1,END) means save values to EEPROM
+    // 3 params (C45,<downpos>,<uppos>,1,END) means save values to EEPROM
     EEPROM_writeAnything(EEPROM_PENLIFT_DOWN, down);
     EEPROM_writeAnything(EEPROM_PENLIFT_UP, up);
     eeprom_loadPenLiftRange();
   }
-  else if (inNoOfParams == 3)
+  else if (inNoOfParams == 2)
   {
-    // 3 params (C45,<downpos>,<uppos>,END) means just do a range test
+    // 2 params (C45,<downpos>,<uppos>,END) means just do a range test
     penlift_movePen(up, down, penLiftSpeed);
     delay(200);
     penlift_movePen(down, up, penLiftSpeed);
@@ -182,7 +183,7 @@ void exec_setPenLiftRange()
 void exec_setMotorSpeed()
 {
   exec_setMotorSpeed((float)atof(inParam1));
-  if (inNoOfParams == 3 && atoi(inParam2) == 1)
+  if (inNoOfParams == 2 && atoi(inParam2) == 1)
     EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
 }
 
@@ -200,7 +201,7 @@ void exec_setMotorSpeed(float speed)
 void exec_setMotorAcceleration()
 {
   exec_setMotorAcceleration((float)atof(inParam1));
-  if (inNoOfParams == 3 && atoi(inParam2) == 1)
+  if (inNoOfParams == 2 && atoi(inParam2) == 1)
     EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
 }
 void exec_setMotorAcceleration(float accel)

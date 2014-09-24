@@ -35,7 +35,9 @@ void penlift_movePen(int start, int end, int delay_ms)
     {
       penHeight.write(i);
       delay(delay_ms);
-//      Serial.println(i);
+#ifdef DEBUG_PENLIFT
+      Serial.println(i);
+#endif
     }
   }
   else
@@ -44,7 +46,9 @@ void penlift_movePen(int start, int end, int delay_ms)
     {
       penHeight.write(i);
       delay(delay_ms);
-//      Serial.println(i);
+#ifdef DEBUG_PENLIFT
+      Serial.println(i);
+#endif
     }
   }
   penHeight.detach();
@@ -54,7 +58,9 @@ void penlift_penUp()
 {
   if (inNoOfParams > 1)
   {
-//    Serial.print("Penup with params");
+#ifdef DEBUG_PENLIFT
+    Serial.print("Penup with params");
+#endif
     int positionToMoveFrom = isPenUp ? upPosition : downPosition;
     upPosition = atoi(inParam1);
     penlift_movePen(positionToMoveFrom, upPosition, penLiftSpeed);
