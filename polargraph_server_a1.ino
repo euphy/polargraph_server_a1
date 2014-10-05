@@ -35,6 +35,7 @@ Comment the lines below in or out to control what gets compiled.
 //#define DEBUG
 //#define DEBUG_COMMS
 //#define DEBUG_PENLIFT
+//#define DEBUG_PIXEL
 
 // Program features
 // ================
@@ -46,8 +47,8 @@ Comment the lines below in or out to control what gets compiled.
 // ===============================================
 // Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-#define ADAFRUIT_MOTORSHIELD_V2
 //#define ADAFRUIT_MOTORSHIELD_V1
+#define ADAFRUIT_MOTORSHIELD_V2
 
 
 #include <AccelStepper.h>
@@ -59,7 +60,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.10.3";
+const String FIRMWARE_VERSION_NO = "1.10.4";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
@@ -118,7 +119,7 @@ long maxLength = 0;
 const int INLENGTH = 50;
 const char INTERMINATOR = 10;
 
-static float penWidth = 0.8; // line width in mm
+float penWidth = 0.8F; // line width in mm
 
 boolean reportingPosition = true;
 boolean acceleration = true;
