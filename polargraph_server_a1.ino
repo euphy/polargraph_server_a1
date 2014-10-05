@@ -60,7 +60,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.10.4";
+const String FIRMWARE_VERSION_NO = "1.10.5";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
