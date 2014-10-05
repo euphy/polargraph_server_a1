@@ -244,7 +244,7 @@ void exec_changeLengthRelative()
 void exec_changeLength()
 {
   float lenA = multiplier((float)atof(inParam1));
-  float lenB = multiplier((float)atof(inParam1));
+  float lenB = multiplier((float)atof(inParam2));
   
   changeLength(lenA, lenB);
 }
