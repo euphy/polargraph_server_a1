@@ -47,8 +47,13 @@ Comment the lines below in or out to control what gets compiled.
 // ===============================================
 // Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-//#define ADAFRUIT_MOTORSHIELD_V1
-#define ADAFRUIT_MOTORSHIELD_V2
+// Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
+// choose SERIAL_STEPPER_DRIVERS and define your pins at the bottom of 'configuration.ino'.
+#define ADAFRUIT_MOTORSHIELD_V1
+//#define ADAFRUIT_MOTORSHIELD_V2
+//#define SERIAL_STEPPER_DRIVERS 
+
+
 
 
 #include <AccelStepper.h>
@@ -60,7 +65,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.10.5";
+const String FIRMWARE_VERSION_NO = "1.10.6";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
