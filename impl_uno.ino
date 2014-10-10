@@ -18,7 +18,8 @@ void impl_runBackgroundProcesses()
   long motorCutoffTime = millis() - lastOperationTime;
   if ((automaticPowerDown) && (powerIsOn) && (motorCutoffTime > motorIdleTimeBeforePowerDown))
   {
-    Serial.println(F("MSG_INFO_STRPowering down."));
+    Serial.print(MSG_I_STR);
+    Serial.println(F("Powering down."));
     impl_releaseMotors();
   }
 }
@@ -39,7 +40,6 @@ void impl_executeCommand(String &com)
   }
 }
 
-
 void impl_engageMotors()
 {
   motorA.enableOutputs();
@@ -55,12 +55,13 @@ void impl_releaseMotors()
 {
   motorA.disableOutputs();
   motorB.disableOutputs();  
+#ifdef ADAFRUIT_MOTORSHIELD_V2
+  afMotorA->release();
+  afMotorB->release();
+#endif
 #ifdef PENLIFT 
   penlift_penUp();
 #endif
   powerIsOn = false;  
 }
-//
-//void impl_transform(float &tA, float &tB)
-//{ 
-//}
+

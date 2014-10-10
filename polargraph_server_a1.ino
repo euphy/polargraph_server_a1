@@ -149,7 +149,7 @@ boolean commandConfirmed = false;
 int rebroadcastReadyInterval = 5000;
 long lastOperationTime = 0L;
 long motorIdleTimeBeforePowerDown = 600000L;
-boolean automaticPowerDown = false;
+boolean automaticPowerDown = true;
 boolean powerIsOn = false;
 
 long lastInteractionTime = 0L;
