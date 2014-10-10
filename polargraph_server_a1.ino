@@ -47,12 +47,17 @@ Comment the lines below in or out to control what gets compiled.
 // ===============================================
 // Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-// Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
-// choose SERIAL_STEPPER_DRIVERS and define your pins at the bottom of 'configuration.ino'.
+// So regardless of what you choose here, remember to sort out the #includes in configuration.ino.
+
 #define ADAFRUIT_MOTORSHIELD_V1
 //#define ADAFRUIT_MOTORSHIELD_V2
+
+// Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
+// choose SERIAL_STEPPER_DRIVERS and define your pins at the bottom of 'configuration.ino'.
 //#define SERIAL_STEPPER_DRIVERS 
 
+// Using a signal amplifier like a UNL2003? 
+//#define UNL2003_DRIVER
 
 
 
@@ -91,7 +96,7 @@ const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
 static int penLiftSpeed = 3; // ms between steps of moving motor
-byte const PEN_HEIGHT_SERVO_PIN = 9;
+byte const PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
 boolean isPenUp = false;
 
 int motorStepsPerRev = 800;

@@ -38,7 +38,6 @@ stepsticks, Pololu gear), then look
 //#include <Adafruit_MotorShield.h>
 //#include "utility/Adafruit_PWMServoDriver.h"
 
-
 // Adafruiters, you don't need to worry about anything more in this file.
 
 #ifdef ADAFRUIT_MOTORSHIELD_V1
@@ -50,6 +49,7 @@ void forwarda() { afMotorA.onestep(FORWARD, stepType); }
 void backwarda() { afMotorA.onestep(BACKWARD, stepType); }
 void forwardb() { afMotorB.onestep(FORWARD, stepType); }
 void backwardb() { afMotorB.onestep(BACKWARD, stepType); }
+
 AccelStepper motorA(forwarda, backwarda);
 AccelStepper motorB(forwardb, backwardb);
 #endif
@@ -87,7 +87,41 @@ that if you can. If you can't, then you know how to change it.
 #define MOTOR_B_DIR_PIN 8
 AccelStepper motorA(1,MOTOR_A_STEP_PIN, MOTOR_A_DIR_PIN); 
 AccelStepper motorB(1,MOTOR_B_STEP_PIN, MOTOR_B_DIR_PIN); 
+#endif
 
+#ifdef UNL2003
+// Contributed by @j0nson
+// Initialize ULN2003 stepper driver
+// first number is type of stepper motor, 4 for a normal 4 wire step motor, 8 for a halfstepped normal 4 wire motor
+//Connection Directions
+// MotorA
+//ULN2003  Arduino  AcceStepper Init
+//IN1      2        2
+//IN2      3        4
+//IN3      4        3
+//IN4      5        5
+// MotorB
+//ULN2003  Arduino  AcceStepper Init
+//IN1      6        6
+//IN2      7        8
+//IN3      8        7
+//IN4      9        9
+
+//for a 28YBJ-48 Stepper, change these parameters above
+//Step angle (8-step) 5.625deg, 64 steps per rev
+//Step angle (4-step) 11.25deg, 32 steps per rev
+//gear reduction ratio 1/63.68395
+
+// motorStepsPerRev = 32 * 63.68395 = 2038; //for 4 step sequence
+// motorStepsPerRev = 64 * 63.68395 = 4076; //for 8 step sequence
+
+// motorStepsPerRev = 4076;
+// mmPerRev = 63;
+// defaultStepsPerRev = 4076;
+// defaultMmPerRev = 63;
+
+AccelStepper motorA(8, 6,8,7,9);
+AccelStepper motorB(8, 2,4,3,5);
 #endif
 
 void configuration_motorSetup()
