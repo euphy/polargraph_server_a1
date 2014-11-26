@@ -89,7 +89,7 @@ AccelStepper motorA(1,MOTOR_A_STEP_PIN, MOTOR_A_DIR_PIN);
 AccelStepper motorB(1,MOTOR_B_STEP_PIN, MOTOR_B_DIR_PIN); 
 #endif
 
-#ifdef UNL2003
+#ifdef UNL2003_DRIVER
 // Contributed by @j0nson
 // Initialize ULN2003 stepper driver
 // first number is type of stepper motor, 4 for a normal 4 wire step motor, 8 for a halfstepped normal 4 wire motor
