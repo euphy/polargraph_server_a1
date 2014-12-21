@@ -21,7 +21,8 @@ Equally, if you are using Adafruit Motorshield v2, make sure the #include
 lines under V1 are precede with //.
 
 If you are using generic serial stepper drivers (eg EasyDrivers, 
-stepsticks, Pololu gear), then look
+stepsticks, Pololu gear), or signal amplifiers (eg UNL2003) then comment out 
+all of the #include lines for the adafruit shields.
 */
 
 // =================================================================
