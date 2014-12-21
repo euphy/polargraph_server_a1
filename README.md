@@ -14,6 +14,7 @@ Motor driver:
 -------------
 
 This firmware works for:
+
 1. Adafruit Motorshield v1 that uses AFMotor as it's software driver
 2. Adafruit Motorshield v2 that uses Adafruit_MotorShield as it's software driver
 3. Generic serial stepper drivers, eg Stepsticks or Easy Drivers
