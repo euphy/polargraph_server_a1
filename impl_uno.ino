@@ -10,7 +10,79 @@ without "store" features. Doesn't actually do anything except
 pass the command to the real executeCommand.  */
 void impl_processCommand(String com)
 {
+#if MICROPROCESSOR == MC_UNO
   impl_executeCommand(com);
+#elif MICROPROCESSOR == MC_MEGA
+  // check for change mode commands
+  if (com.startsWith(CMD_MODE_STORE_COMMANDS)
+  || com.startsWith(CMD_MODE_LIVE))
+  {
+    Serial.println("Changing mode.");
+    impl_executeCommand(com);
+  }
+  // else execute / store the command
+  else if (storeCommands)
+  {
+    Serial.print(F("Storing command:"));
+    Serial.println(com);
+    sd_storeCommand(com);
+  }
+  else
+  {
+    impl_executeCommand(com);
+  }
+#endif
+}
+
+
+
+void impl_executeCommand(String &com)
+{
+  if (exec_executeBasicCommand(com))
+  {
+    // that's nice, it worked
+  }
+#if MICROPROCESSOR == MC_MEGA
+  else if (com.startsWith(CMD_DRAWCIRCLEPIXEL))
+    curves_pixel_drawCircularPixel();
+//  else if (com.startsWith(CMD_TESTPATTERN))
+//    testPattern();
+  else if (com.startsWith(CMD_TESTPENWIDTHSCRIBBLE))
+    impl_pixel_testPenWidthScribble();
+  else if (com.startsWith(CMD_DRAWSAWPIXEL))
+    impl_pixel_drawSawtoothPixel();
+  else if (com.startsWith(CMD_DRAWDIRECTIONTEST))
+    impl_exec_drawTestDirectionSquare();
+  else if (com.startsWith(CMD_MODE_STORE_COMMANDS))
+    impl_exec_changeToStoreCommandMode();
+  else if (com.startsWith(CMD_MODE_LIVE))
+    impl_exec_changeToLiveCommandMode();
+  else if (com.startsWith(CMD_MODE_EXEC_FROM_STORE))
+    impl_exec_execFromStore();
+  else if (com.startsWith(CMD_RANDOM_DRAW))
+    drawRandom();
+  else if (com.startsWith(CMD_SET_ROVE_AREA))
+    rove_setRoveArea();
+  else if (com.startsWith(CMD_START_TEXT))
+    rove_startText();
+  else if (com.startsWith(CMD_DRAW_SPRITE))
+    sprite_drawSprite();
+  else if (com.startsWith(CMD_DRAW_RANDOM_SPRITE))
+    sprite_drawRandomPositionedSprite();
+  else if (com.startsWith(CMD_CHANGELENGTH_RELATIVE))
+    exec_changeLength();
+  else if (com.startsWith(CMD_SWIRLING))
+    rove_controlSwirling();
+  else if (com.startsWith(CMD_DRAW_NORWEGIAN))
+    rove_drawNorwegianFromFile();
+  else if (com.startsWith(CMD_DRAW_NORWEGIAN_OUTLINE))
+    rove_drawRoveAreaFittedToImage();
+#endif
+  else
+  {
+    comms_unrecognisedCommand(com);
+    comms_ready();
+  }
 }
 
 void impl_runBackgroundProcesses()
@@ -27,18 +99,208 @@ void impl_runBackgroundProcesses()
 void impl_loadMachineSpecFromEeprom()
 {}
 
-void impl_executeCommand(String &com)
+#if MICROPROCESSOR == MC_MEGA
+void impl_exec_execFromStore()
 {
-  if (exec_executeBasicCommand(com))
+  String fileToExec = inParam1;
+  if (fileToExec != "")
   {
-    // that's nice, it worked
+    currentlyDrawingFromFile = true;
+    Serial.print("Filename to read from: ");
+    Serial.println(fileToExec);
+    commandFilename = fileToExec;
+    impl_exec_execFromStore(commandFilename);
+    currentlyDrawingFromFile = true;
   }
   else
   {
-    comms_unrecognisedCommand(com);
-    comms_ready();
+    Serial.println("No filename supplied to read from.");
+  }
+  
+}
+
+void impl_exec_execFromStore(String inFilename)
+{
+  if (inFilename != "")
+  {
+    String noBlanks = "";
+    // remove blanks
+    for (int i = 0; i<inFilename.length(); i++)
+    {
+      if (inFilename[i] != ' ')
+        noBlanks = noBlanks + inFilename[i];
+    }
+    
+    char filename[noBlanks.length()+1];
+    noBlanks.toCharArray(filename, noBlanks.length()+1);
+#ifdef DEBUG_SD    
+    Serial.print("Array to read from: ");
+    Serial.println(filename);
+#endif
+    File readFile = SD.open(filename, FILE_READ);
+    if (readFile)
+    {
+      Serial.print("Opened file:");
+      Serial.println(noBlanks);
+      String command = "";
+      while (readFile.available() && currentlyDrawingFromFile)
+      {
+#ifdef DEBUG_SD        
+        Serial.println("Reading...");
+        // poll for input
+#endif
+        char ch = readFile.read();
+#ifdef DEBUG_SD        
+        Serial.print(".");
+        Serial.print(ch);
+        Serial.print("-");
+#endif
+        if (ch == 13 || ch == 10)
+        {
+#ifdef DEBUG_SD        
+          Serial.println("New line");
+#endif
+          // execute the line
+          command.trim();
+          boolean commandParsed = comms_parseCommand(command);
+          if (commandParsed)
+          {
+#ifdef DEBUG_SD        
+            Serial.println("Stored command parsed.");
+#endif
+            Serial.print(F("Executing command:"));
+            Serial.println(command);
+            if (echoingStoredCommands) lcd_echoLastCommandToDisplay(command, inFilename+": ");
+            impl_executeCommand(command);
+          }
+#ifdef DEBUG_SD        
+          else Serial.println("Stored command WAS NOT parsed.");
+#endif            
+          command = "";
+          lcd_checkForInput();
+        }
+        else
+          command += ch;
+
+#ifdef DEBUG_SD        
+        Serial.print("Command building:");
+        Serial.println(command);
+#endif
+      }
+      Serial.println("Finished with the file.");
+      currentlyDrawingFromFile = false;
+      readFile.close();
+    }
+    else
+    {
+      Serial.println("Couldn't find that file, btw.");
+      currentlyDrawingFromFile = false;
+    }
+  }
+  else
+  {
+    Serial.println("No filename supplied to read from.");
+    currentlyDrawingFromFile = false;
+  }
+  
+}
+
+void impl_exec_changeToStoreCommandMode()
+{
+  String newfilename = inParam1;
+  String newFile = inParam2;
+  if (newfilename != "")
+  {
+    Serial.print("Filename for command store: ");
+    Serial.println(newfilename);
+    storeCommands = true;
+    commandFilename = newfilename;
+    if (newFile.equals("R"))
+    {
+      // delete file if it exists
+      char filename[newfilename.length()+1];
+      newfilename.toCharArray(filename, newfilename.length()+1);
+      
+      if (SD.exists(filename))
+      {
+        // file exists
+        Serial.println(F("File already exists."));
+        boolean removed = SD.remove(filename);
+        if (removed)
+          Serial.println(F("File removed."));
+        
+      }
+    }
+  }
+  else
+  {
+    Serial.println("No filename supplied to write to.");
   }
 }
+
+void impl_exec_changeToLiveCommandMode()
+{
+  Serial.println(F("Changing back to live mode."));
+  storeCommands = false;
+}
+
+void impl_pixel_testPenWidthScribble()
+{
+  int rowWidth = multiplier(asInt(inParam1));
+  float startWidth = asFloat(inParam2);
+  float endWidth = asFloat(inParam3); 
+  float incSize = asFloat(inParam4);
+  
+  boolean ltr = true;
+  
+  float oldPenWidth = penWidth;
+  int iterations = 0;
+  
+  int posA = motorA.currentPosition();
+  int posB = motorB.currentPosition();
+
+  int startColumn = posA;
+  int startRow = posB;
+  
+  for (float pw = startWidth; pw <= endWidth; pw+=incSize)
+  {
+    iterations++;
+    int column = posA;
+    
+    penWidth = pw;
+    int maxDens = pixel_maxDensity(penWidth, rowWidth);
+    Serial.print(F("Penwidth test "));
+    Serial.print(iterations);
+    Serial.print(F(", pen width: "));
+    Serial.print(penWidth);
+    Serial.print(F(", max density: "));
+    Serial.println(maxDens);
+    
+    for (int density = maxDens; density >= 0; density--)
+    {
+      pixel_drawScribblePixel(posA, posB, rowWidth, density);
+      posB+=rowWidth;
+    }
+    
+    posA+=rowWidth;
+    posB = startRow;
+  }
+  
+  changeLength(long(posA-(rowWidth/2)), long(startRow-(rowWidth/2)));
+
+  penWidth = oldPenWidth;
+  
+  moveB(0-rowWidth);
+  for (int i = 1; i <= iterations; i++)
+  {
+    moveB(0-(rowWidth/2));
+    moveA(0-rowWidth);
+    moveB(rowWidth/2);
+  }
+  
+  penWidth = oldPenWidth;
+}    
+#endif
 
 void impl_engageMotors()
 {

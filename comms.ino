@@ -21,7 +21,7 @@ boolean comms_waitForNextCommand(char *buf)
   int bufPos = 0;
   for (int i = 0; i<INLENGTH; i++) {
     buf[i] = 0;
-  }  
+  }
   long lastRxTime = 0L;
 
   // loop while there's there isn't a terminated command.
@@ -261,5 +261,4 @@ void comms_unrecognisedCommand(String &com)
   Serial.print(com);
   Serial.println(F(" not recognised."));
 }  
-
 
