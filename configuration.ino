@@ -28,7 +28,7 @@ stepsticks, Pololu gear), then look
 // Configuring Adafruit motorshield version 1.
 // Using Adafruit Motorshield V1? Make sure the #include line below is NOT commented-out.
 // Using Adafruit Motorshield V2? Comment out the line below.
-//#include <AFMotor.h>
+#include <AFMotor.h>
 
 // =================================================================
 // Configuring Adafruit motorshield version 2.

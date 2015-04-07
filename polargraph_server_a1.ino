@@ -40,8 +40,8 @@ Comment the lines below in or out to control what gets compiled.
 // ===================================================
 // UNO or MEGA
 #ifndef MICROCONTROLLER
-//#define MICROCONTROLLER MC_UNO
-#define MICROCONTROLLER MC_MEGA
+#define MICROCONTROLLER MC_UNO
+//#define MICROCONTROLLER MC_MEGA
 #endif
 
 // Turn on some debugging code
@@ -63,7 +63,7 @@ Comment the lines below in or out to control what gets compiled.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
 // So regardless of what you choose here, remember to sort out the #includes in configuration.ino.
 
-//#define ADAFRUIT_MOTORSHIELD_V1
+#define ADAFRUIT_MOTORSHIELD_V1
 //#define ADAFRUIT_MOTORSHIELD_V2
 
 // Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
@@ -71,7 +71,7 @@ Comment the lines below in or out to control what gets compiled.
 //#define SERIAL_STEPPER_DRIVERS 
 
 // Using a signal amplifier like a UNL2003? 
-#define UNL2003_DRIVER
+//#define UNL2003_DRIVER
 
 
 // The names of the different microcontrollers
@@ -87,7 +87,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.10.6";
+const String FIRMWARE_VERSION_NO = "2.0";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
