@@ -40,8 +40,8 @@ Comment the lines below in or out to control what gets compiled.
 // ===================================================
 // UNO or MEGA
 #ifndef MICROCONTROLLER
-#define MICROCONTROLLER MC_UNO
-//#define MICROCONTROLLER MC_MEGA
+//#define MICROCONTROLLER MC_UNO
+#define MICROCONTROLLER MC_MEGA
 #endif
 
 // Turn on some debugging code
@@ -63,7 +63,7 @@ Comment the lines below in or out to control what gets compiled.
 // REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
 // So regardless of what you choose here, remember to sort out the #includes in configuration.ino.
 
-#define ADAFRUIT_MOTORSHIELD_V1
+//#define ADAFRUIT_MOTORSHIELD_V1
 //#define ADAFRUIT_MOTORSHIELD_V2
 
 // Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
@@ -71,7 +71,7 @@ Comment the lines below in or out to control what gets compiled.
 //#define SERIAL_STEPPER_DRIVERS 
 
 // Using a signal amplifier like a UNL2003? 
-//#define UNL2003_DRIVER
+#define UNL2003_DRIVER
 
 
 // The names of the different microcontrollers
@@ -87,7 +87,7 @@ Comment the lines below in or out to control what gets compiled.
     These variables are common to all polargraph server builds
 =========================================================== */    
 
-const String FIRMWARE_VERSION_NO = "1.12";
+const String FIRMWARE_VERSION_NO = "1.10.6";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
@@ -237,8 +237,10 @@ const static String CMD_SETMACHINESTEPMULTIPLIER = "C37";
 void setup() 
 {
   Serial.begin(57600);           // set up Serial library at 57600 bps
-  Serial.print("POLARGRAPH ON!");
-  Serial.println();
+  Serial.println("POLARGRAPH ON!");
+  Serial.print("Hardware: ");
+  Serial.println(MICROCONTROLLER);
+  
   configuration_motorSetup();
   eeprom_loadMachineSpecFromEeprom();
   configuration_setup();
@@ -276,6 +278,87 @@ void loop()
   }
 }
 
+#if MICROCONTROLLER == MC_MEGA
+const static String CMD_TESTPENWIDTHSCRIBBLE = "C12";
+const static String CMD_DRAWSAWPIXEL = "C15,";
+const static String CMD_DRAWCIRCLEPIXEL = "C16";
+const static String CMD_SET_ROVE_AREA = "C21";
+const static String CMD_DRAWDIRECTIONTEST = "C28";
+const static String CMD_MODE_STORE_COMMANDS = "C33";
+const static String CMD_MODE_EXEC_FROM_STORE = "C34";
+const static String CMD_MODE_LIVE = "C35";
+const static String CMD_RANDOM_DRAW = "C36";
+const static String CMD_START_TEXT = "C38";
+const static String CMD_DRAW_SPRITE = "C39";
+const static String CMD_CHANGELENGTH_RELATIVE = "C40";
+const static String CMD_SWIRLING = "C41";
+const static String CMD_DRAW_RANDOM_SPRITE = "C42";
+const static String CMD_DRAW_NORWEGIAN = "C43";
+const static String CMD_DRAW_NORWEGIAN_OUTLINE = "C44";
 
+/*  End stop pin definitions  */
+const int ENDSTOP_X_MAX = 17;
+const int ENDSTOP_X_MIN = 16;
+const int ENDSTOP_Y_MAX = 15;
+const int ENDSTOP_Y_MIN = 14;
+
+long ENDSTOP_X_MIN_POSITION = 130;
+long ENDSTOP_Y_MIN_POSITION = 130;
+
+// size and location of rove area
+long rove1x = 1000;
+long rove1y = 1000;
+long roveWidth = 5000;
+long roveHeight = 8000;
+
+boolean swirling = false;
+String spritePrefix = "";
+int textRowSize = 200;
+int textCharSize = 180;
+
+boolean useRoveArea = false;
+
+int commandNo = 0;
+int errorInjection = 0;
+
+boolean storeCommands = false;
+boolean drawFromStore = false;
+String commandFilename = "";
+
+// sd card stuff
+const int chipSelect = 53;
+boolean sdCardInit = false;
+
+// set up variables using the SD utility library functions:
+File root;
+boolean cardPresent = false;
+boolean cardInit = false;
+boolean echoingStoredCommands = false;
+
+// the file itself
+File pbmFile;
+
+// information we extract about the bitmap file
+long pbmWidth, pbmHeight;
+float pbmScaling = 1.0;
+int pbmDepth, pbmImageoffset;
+long pbmFileLength = 0;
+float pbmAspectRatio = 1.0;
+
+volatile int speedChangeIncrement = 100;
+volatile int accelChangeIncrement = 100;
+volatile float penWidthIncrement = 0.05;
+volatile int moveIncrement = 400;
+
+boolean currentlyDrawingFromFile = false;
+String currentlyDrawingFilename = "";
+
+static float translateX = 0.0;
+static float translateY = 0.0;
+static float scaleX = 1.0;
+static float scaleY = 1.0;
+static int rotateTransform = 0;
+
+#endif
 
 

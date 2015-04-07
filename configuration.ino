@@ -21,15 +21,14 @@ Equally, if you are using Adafruit Motorshield v2, make sure the #include
 lines under V1 are precede with //.
 
 If you are using generic serial stepper drivers (eg EasyDrivers, 
-stepsticks, Pololu gear), or signal amplifiers (eg UNL2003) then comment out 
-all of the #include lines for the adafruit shields.
+stepsticks, Pololu gear), then look
 */
 
 // =================================================================
 // Configuring Adafruit motorshield version 1.
 // Using Adafruit Motorshield V1? Make sure the #include line below is NOT commented-out.
 // Using Adafruit Motorshield V2? Comment out the line below.
-#include <AFMotor.h>
+//#include <AFMotor.h>
 
 // =================================================================
 // Configuring Adafruit motorshield version 2.
