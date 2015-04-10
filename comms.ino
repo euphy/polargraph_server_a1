@@ -74,7 +74,7 @@ boolean comms_waitForNextCommand(char *buf)
 #endif
       
       // look at it, if it's a terminator, then lets terminate the string
-      if (ch == INTERMINATOR) {
+      if (ch == INTERMINATOR || ch == SEMICOLON) {
         buf[bufPos] = 0; // null terminate the string
         terminated = true;
 #ifdef DEBUG_COMMS

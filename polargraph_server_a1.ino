@@ -47,7 +47,7 @@ Comment the lines below in or out to control what gets compiled.
 // Turn on some debugging code
 // ===========================
 //#define DEBUG
-//#define DEBUG_COMMS
+#define DEBUG_COMMS
 //#define DEBUG_PENLIFT
 //#define DEBUG_PIXEL
 
@@ -144,7 +144,8 @@ long maxLength = 0;
 
 //static char rowAxis = 'A';
 const int INLENGTH = 50;
-const char INTERMINATOR = ';';
+const char INTERMINATOR = 10;
+const char SEMICOLON = ';';
 
 float penWidth = 0.8F; // line width in mm
 
@@ -192,7 +193,12 @@ const static byte DIR_MODE_PRESET = 2;
 static byte globalDrawDirectionMode = DIR_MODE_AUTO;
 #endif
 
-#define READY_STR "READY"
+#if MICROCONTROLLER == MC_MEGA
+  #define READY_STR "READY_100"
+#else
+  #define READY_STR "READY"
+#endif
+
 #define RESEND_STR "RESEND"
 #define DRAWING_STR "DRAWING"
 #define OUT_CMD_SYNC_STR "SYNC,"
