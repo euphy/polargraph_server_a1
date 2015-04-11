@@ -10,9 +10,8 @@ without "store" features. Doesn't actually do anything except
 pass the command to the real executeCommand.  */
 void impl_processCommand(String com)
 {
-#if MICROPROCESSOR == MC_UNO
   impl_executeCommand(com);
-#elif MICROPROCESSOR == MC_MEGA
+#if MICROPROCESSOR == MC_MEGA
   // check for change mode commands
   if (com.startsWith(CMD_MODE_STORE_COMMANDS)
   || com.startsWith(CMD_MODE_LIVE))
@@ -41,6 +40,9 @@ void impl_executeCommand(String &com)
   if (exec_executeBasicCommand(com))
   {
     // that's nice, it worked
+#ifdef DEBUG
+    Serial.println("Basic Command executed.");
+#endif
   }
 #if MICROPROCESSOR == MC_MEGA
   else if (com.startsWith(CMD_DRAWCIRCLEPIXEL))
