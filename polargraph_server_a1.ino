@@ -46,8 +46,8 @@ Comment the lines below in or out to control what gets compiled.
 
 // Turn on some debugging code
 // ===========================
-#define DEBUG
-#define DEBUG_COMMS
+//#define DEBUG
+//#define DEBUG_COMMS
 //#define DEBUG_PENLIFT
 //#define DEBUG_PIXEL
 
