@@ -40,8 +40,8 @@ Comment the lines below in or out to control what gets compiled.
 // ===================================================
 // UNO or MEGA
 #ifndef MICROCONTROLLER
-//#define MICROCONTROLLER MC_UNO
-#define MICROCONTROLLER MC_MEGA
+#define MICROCONTROLLER MC_UNO
+//#define MICROCONTROLLER MC_MEGA
 #endif
 
 // Turn on some debugging code
