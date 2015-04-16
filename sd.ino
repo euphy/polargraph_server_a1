@@ -16,7 +16,7 @@ For initialising, reading and writing the SD card data store.
     Processing the SD card if there is one attached. 
 =================================================================*/
 
-#if MICROCONTROLLER == MEGA
+#if MICROCONTROLLER == MC_MEGA
 void sd_initSD()
 {
   currentlyDrawingFromFile = false;

@@ -40,13 +40,13 @@ Comment the lines below in or out to control what gets compiled.
 // ===================================================
 // UNO or MEGA
 #ifndef MICROCONTROLLER
-#define MICROCONTROLLER MC_UNO
-//#define MICROCONTROLLER MC_MEGA
+//#define MICROCONTROLLER MC_UNO
+#define MICROCONTROLLER MC_MEGA
 #endif
 
 // Turn on some debugging code
 // ===========================
-//#define DEBUG
+#define DEBUG
 #define DEBUG_COMMS
 //#define DEBUG_PENLIFT
 //#define DEBUG_PIXEL
@@ -247,6 +247,13 @@ void setup()
   Serial.print("Hardware: ");
   Serial.println(MICROCONTROLLER);
   
+  #if MICROCONTROLLER == MC_MEGA
+  Serial.println("MC_MEGA");
+  #elif MICROCONTROLLER == MC_UNO
+  Serial.println("MC_UNO");
+  #else
+  Serial.println("No MC");
+  #endif
   configuration_motorSetup();
   eeprom_loadMachineSpecFromEeprom();
   configuration_setup();
