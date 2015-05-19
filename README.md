@@ -1,7 +1,9 @@
 polargraph_server_a1
 ====================
 
-Polargraph Server for ATMEGA328 based arduino boards using Adafruit motorshields.
+Polargraph Server for Arduino UNO and MEGA compatible boards using Adafruit motorshields,
+serial stepper drivers (eg Easy Drivers, stepsticks etc) or signal amplifiers (eg ULN2003s).
+
 It is called *_a1* because it is the version for the first arduino (ie Uno, or Duemilanove).  
 Bit obtuse that, I know.
 
@@ -20,31 +22,22 @@ This firmware works for:
 3. Generic serial stepper drivers, eg Stepsticks or Easy Drivers
 4. Four-wire signal amplifier, eg UNL2003
 
-To switch between the different drivers, comment out the other lines in polargraph_server_a1.ino
+To switch between the different drivers, and to configure a few other bits and pieces,
+comment out some lines near the beginning of polargraph_server_a1.ino.
 
-``` C++
-#define ADAFRUIT_MOTORSHIELD_V1
-//#define ADAFRUIT_MOTORSHIELD_V2
+There are five config sections:
+1. Specify what kind of controller board you are using
+2. Add some libraries if you have a MEGA
+3. Specify what kind of motor driver you are using:
+  i. Adafruit Motorshield v1
+  ii. Adafruit Motorshield v2
+  iii. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
+  iv. Signal amplifier like a UNL2003*
+4.  Turn on some debugging code
+5.  Disable program features if you need to free up space
 
-// Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
-// choose SERIAL_STEPPER_DRIVERS and define your pins at the bottom of 'configuration.ino'.
-//#define SERIAL_STEPPER_DRIVERS 
-
-// Using a signal amplifier like a UNL2003? 
-//#define UNL2003_DRIVER
-```
-
-AND then, you also need to comment out the irrelevant #include statements in configuration.ino too.
-
-``` C++
-// Using Adafruit Motorshield V2? Comment out this one line underneath.
-#include <AFMotor.h>
-
-// Using Adafruit Motorshield V1? Comment out the three INCLUDE lines below.
-//#include <Wire.h>
-//#include <Adafruit_MotorShield.h>
-//#include "utility/Adafruit_PWMServoDriver.h"
-```
+* For motor drivers iii and iv, you will need to change the values in
+  configuration.ino to set the exact pins the drivers are wired up to.
 
 
 The program has a core part that consists of the following files that are common to all Polargraph Server versions:
@@ -62,10 +55,19 @@ and
 
 which is named for the project.
 
-The only other file worth highlighing is **impl_uno.ino** which has the uno-only implementations of the server
-features.  This file is the one that is modified for different platforms / processors.
 
-Written by Sandy Noble
+Polargraph
+----------
+
+Polargraph is the name of the project, and is a portmanteau word invented by the writer
+solely for this purpose. Any machine that runs the Polargraph software is technically a 
+polargraph machine. I usually reserve the big-P "Polargraph" for things made by
+The Polargraph Company, including the Polargraph software and PolargraphSD machine.
+
+Other hanging-v plotters are probably compatible with Polargraph software, but unless
+they run it, they are not even polargraphs with a small P.
+
+Project and software written by Sandy Noble.
 
 Released under GNU License version 3.
 
