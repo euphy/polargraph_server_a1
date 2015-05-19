@@ -25,14 +25,16 @@ This firmware works for:
 To switch between the different drivers, and to configure a few other bits and pieces,
 comment out some lines near the beginning of polargraph_server_a1.ino.
 
+
 There are five config sections:
+
 1. Specify what kind of controller board you are using
 2. Add some libraries if you have a MEGA
 3. Specify what kind of motor driver you are using:
-  i. Adafruit Motorshield v1
-  ii. Adafruit Motorshield v2
-  iii. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
-  iv. Signal amplifier like a UNL2003*
+  1. Adafruit Motorshield v1
+  2. Adafruit Motorshield v2
+  3. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
+  4. Signal amplifier like a UNL2003*
 4.  Turn on some debugging code
 5.  Disable program features if you need to free up space
 
