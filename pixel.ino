@@ -164,6 +164,8 @@ void pixel_drawScribblePixel()
 
     density = pixel_scaleDensity(density, 255, maxDens);
     pixel_drawScribblePixel(originA, originB, size*1.1, density);
+    
+//    outputAvailableMemory(); 
 }
 
 void pixel_drawScribblePixel(long originA, long originB, int size, int density) 

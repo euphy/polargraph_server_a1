@@ -1,25 +1,13 @@
 /**
-*  Polargraph Server for ATMEGA328-based arduino boards.
+*  Polargraph Server for Arduino UNO and MEGA compatible boards.
 *  Written by Sandy Noble
 *  Released under GNU License version 3.
 *  http://www.polargraph.co.uk
 *  https://github.com/euphy/polargraph_server_a1
 
-The program has a core part that consists of the following files:
 
-- comms.ino
-- configuration.ino
-- eeprom.ino
-- exec.ino
-- penlift.ino
-- pixel.ino
-- util.ino
-
-and the first portion of the main file, probably called
-something like polargraph_server_a1.ino.
-
-CONFIGURATION!! Read this!
-==========================
+CONFIGURATION!! Read this! Really.
+==================================
 
 Kung fu is like a game of chess. You must think first! Before you move.
 
@@ -27,54 +15,89 @@ This is a unified codebase for a few different versions of Polargraph Server.
 
 You can control how it is compiled by changing the #define lines below.
 
-Comment the lines below in or out to control what gets compiled.
+There are five config sections:
+1. Specify what kind of controller board you are using
+2. Add some libraries if you have a MEGA
+3. Specify what kind of motor driver you are using:
+  i. Adafruit Motorshield v1
+  ii. Adafruit Motorshield v2
+  iii. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
+  iv. Signal amplifier like a UNL2003*
+4.  Turn on some debugging code
+5.  Disable program features if you need to free up space
+
+* For motor drivers iii and iv, you will need to change the values in
+  configuration.ino to set the exact pins the drivers are wired up to.
+  
 */
 
 
-//http://forum.arduino.cc/index.php?topic=173584.0
-#include <SPI.h>
-#include <SD.h>
-
-
-// Specify what kind of controller board you are using
-// ===================================================
-// UNO or MEGA
+// 1. Specify what kind of controller board you are using
+// ======================================================
+// UNO or MEGA. Uncomment the line for the kind of board you have.
 #ifndef MICROCONTROLLER
 #define MICROCONTROLLER MC_UNO
 //#define MICROCONTROLLER MC_MEGA
 #endif
 
-// Turn on some debugging code
-// ===========================
+
+// 2. Add some libraries if you have a MEGA
+// ========================================
+// Uncomment the SPI and SD lines below if you have a MEGA, and are going to use 
+// the SD features.  http://forum.arduino.cc/index.php?topic=173584.0
+//#include <SPI.h>
+//#include <SD.h>
+
+
+// 3. Specify what kind of motor driver you are using
+// ==================================================
+// Only ONE set of lines below should be uncommented.
+
+//   i. Adafruit Motorshield v1. The original, and still the best.
+//   -------------------------------------------------------------
+#define ADAFRUIT_MOTORSHIELD_V1
+#include <AFMotor.h>
+
+//   ii. Adafruit Motorshield v2. It's all squealy.
+//   ----------------------------------------------
+//#define ADAFRUIT_MOTORSHIELD_V2
+//#include <Wire.h>
+//#include <Adafruit_MotorShield.h>
+//#include "utility/Adafruit_PWMServoDriver.h"
+
+//   iii. Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear)
+//   ----------------------------------------------------------------------------
+//   Don't forget to define your pins in 'configuration.ino'.
+//#define SERIAL_STEPPER_DRIVERS 
+
+//   iv. Using a signal amplifier like a UNL2003? 
+//   --------------------------------------------
+//   Don't forget to define your pins in 'configuration.ino'.
+//   #define UNL2003_DRIVER
+
+
+// 4.  Turn on some debugging code if you want horror
+// =================================================
 //#define DEBUG
 //#define DEBUG_COMMS
 //#define DEBUG_PENLIFT
 //#define DEBUG_PIXEL
 
-// Program features
-// ================
+
+// 5.  Disable program features if you need to free up space
+// ========================================================
 #define PIXEL_DRAWING
 #define PENLIFT
 #define VECTOR_LINES
 
-// Specify what kind of motor driver you are using
-// ===============================================
-// Make sure the version of motorshield you have is listed below WITHOUT "//" on the front.
-// REMEMBER!!!  You need to comment out the matching library imports in the 'configuration.ino' tab too.
-// So regardless of what you choose here, remember to sort out the #includes in configuration.ino.
-
-#define ADAFRUIT_MOTORSHIELD_V1
-//#define ADAFRUIT_MOTORSHIELD_V2
-
-// Using discrete stepper drivers? (eg EasyDriver, stepstick, Pololu gear),
-// choose SERIAL_STEPPER_DRIVERS and define your pins at the bottom of 'configuration.ino'.
-//#define SERIAL_STEPPER_DRIVERS 
-
-// Using a signal amplifier like a UNL2003? 
-//#define UNL2003_DRIVER
 
 
-// The names of the different microcontrollers
+/*  ===========================================================  
+    These variables are common to all polargraph server builds
+=========================================================== */    
+
+// ==========================================================
+// Some microcontroller's names
 #define MC_UNO 1
 #define MC_MEGA 2
 
@@ -83,11 +106,7 @@ Comment the lines below in or out to control what gets compiled.
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-/*  ===========================================================  
-    These variables are common to all polargraph server builds
-=========================================================== */    
-
-const String FIRMWARE_VERSION_NO = "2.0";
+const String FIRMWARE_VERSION_NO = "1.2";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
@@ -112,7 +131,7 @@ const int DEFAULT_DOWN_POSITION = 90;
 const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
-static byte penLiftSpeed = 3; // ms between steps of moving motor
+static int penLiftSpeed = 3; // ms between steps of moving motor
 byte const PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
 boolean isPenUp = false;
 
@@ -127,7 +146,7 @@ static int defaultMachineWidth = 650;
 static int defaultMachineHeight = 650;
 static int defaultMmPerRev = 95;
 static int defaultStepsPerRev = 800;
-static byte defaultStepMultiplier = 1;
+static int defaultStepMultiplier = 1;
 
 float currentMaxSpeed = 800.0;
 float currentAcceleration = 400.0;
@@ -143,7 +162,7 @@ long pageHeight = machineHeight * stepsPerMM;
 long maxLength = 0;
 
 //static char rowAxis = 'A';
-const byte INLENGTH = 50;
+const int INLENGTH = 50;
 const char INTERMINATOR = 10;
 const char SEMICOLON = ';';
 
@@ -244,8 +263,8 @@ void setup()
 {
   Serial.begin(57600);           // set up Serial library at 57600 bps
   Serial.println("POLARGRAPH ON!");
-//  Serial.print("Hardware: ");
-//  Serial.println(MICROCONTROLLER);
+  Serial.print("Hardware: ");
+  Serial.println(MICROCONTROLLER);
   
   #if MICROCONTROLLER == MC_MEGA
   Serial.println("MC_MEGA");

@@ -123,7 +123,11 @@ void sd_alternativeInit() {
   cardInit = true;  
 }
 
-void sd_printDirectory(File dir, int numTabs) {
+/*
+http://stackoverflow.com/questions/18158136/why-cant-i-pass-typedef-or-enum-in-arduino
+Using struct File here so that the SD library does NOT need to be included.
+*/
+void sd_printDirectory(struct File dir, int numTabs) {
    while(true) {
      File entry =  dir.openNextFile();
      if (! entry) {

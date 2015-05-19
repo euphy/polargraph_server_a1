@@ -10,7 +10,9 @@ without "store" features. Doesn't actually do anything except
 pass the command to the real executeCommand.  */
 void impl_processCommand(String com)
 {
+#if MICROCONTROLLER == MC_UNO
   impl_executeCommand(com);
+#endif
 #if MICROCONTROLLER == MC_MEGA
   // check for change mode commands
   if (com.startsWith(CMD_MODE_STORE_COMMANDS)
@@ -32,8 +34,6 @@ void impl_processCommand(String com)
   }
 #endif
 }
-
-
 
 void impl_executeCommand(String &com)
 {
@@ -245,8 +245,6 @@ void impl_exec_changeToLiveCommandMode()
   Serial.println(F("Changing back to live mode."));
   storeCommands = false;
 }
-
-
 #endif
 
 void impl_engageMotors()

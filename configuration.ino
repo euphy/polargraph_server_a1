@@ -11,34 +11,7 @@ This is one of the core files for the polargraph server program.
 It sets up the motor objects (AccelSteppers), and has default
 values for the motor, sprocket and microstepping combinations used
 by polargraphs so far.
-
-Comment out the #include lines for the electrical drivers you DON'T need.
-
-So, if you are using Adafruit Motorshield v1: Make sure the #include lines 
-under V2 are preceded with //.
-
-Equally, if you are using Adafruit Motorshield v2, make sure the #include
-lines under V1 are precede with //.
-
-If you are using generic serial stepper drivers (eg EasyDrivers, 
-stepsticks, Pololu gear), then look
 */
-
-// =================================================================
-// Configuring Adafruit motorshield version 1.
-// Using Adafruit Motorshield V1? Make sure the #include line below is NOT commented-out.
-// Using Adafruit Motorshield V2? Comment out the line below.
-#include <AFMotor.h>
-
-// =================================================================
-// Configuring Adafruit motorshield version 2.
-// Using Adafruit Motorshield V1? Comment out the three INCLUDE lines below.
-// Using Adafruit Motorshield V2? Make sure these three lines are NOT commented-out.
-//#include <Wire.h>
-//#include <Adafruit_MotorShield.h>
-//#include "utility/Adafruit_PWMServoDriver.h"
-
-// Adafruiters, you don't need to worry about anything more in this file.
 
 #ifdef ADAFRUIT_MOTORSHIELD_V1
 const int stepType = INTERLEAVE;
