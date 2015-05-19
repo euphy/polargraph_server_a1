@@ -112,7 +112,7 @@ const int DEFAULT_DOWN_POSITION = 90;
 const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
-static int penLiftSpeed = 3; // ms between steps of moving motor
+static byte penLiftSpeed = 3; // ms between steps of moving motor
 byte const PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
 boolean isPenUp = false;
 
@@ -127,7 +127,7 @@ static int defaultMachineWidth = 650;
 static int defaultMachineHeight = 650;
 static int defaultMmPerRev = 95;
 static int defaultStepsPerRev = 800;
-static int defaultStepMultiplier = 1;
+static byte defaultStepMultiplier = 1;
 
 float currentMaxSpeed = 800.0;
 float currentAcceleration = 400.0;
@@ -143,7 +143,7 @@ long pageHeight = machineHeight * stepsPerMM;
 long maxLength = 0;
 
 //static char rowAxis = 'A';
-const int INLENGTH = 50;
+const byte INLENGTH = 50;
 const char INTERMINATOR = 10;
 const char SEMICOLON = ';';
 
@@ -244,8 +244,8 @@ void setup()
 {
   Serial.begin(57600);           // set up Serial library at 57600 bps
   Serial.println("POLARGRAPH ON!");
-  Serial.print("Hardware: ");
-  Serial.println(MICROCONTROLLER);
+//  Serial.print("Hardware: ");
+//  Serial.println(MICROCONTROLLER);
   
   #if MICROCONTROLLER == MC_MEGA
   Serial.println("MC_MEGA");

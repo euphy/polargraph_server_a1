@@ -233,14 +233,6 @@ void exec_setPosition()
   reportPosition();
 }
 
-void exec_changeLengthRelative()
-{
-  long lenA = multiplier(atol(inParam1));
-  long lenB = multiplier(atol(inParam2));
-  
-  changeLengthRelative(lenA, lenB);
-}  
-
 void exec_changeLength()
 {
   float lenA = multiplier((float)atof(inParam1));
@@ -368,7 +360,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   else
   {
     Serial.print(MSG_E_STR);
-    Serial.println(F("Line is not on the page. Skipping it."));
+    Serial.println(F("Line not on page. Skipping it."));
   }
 //  outputAvailableMemory();
 }

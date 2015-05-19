@@ -118,37 +118,6 @@ void changeLength(long tAl, long tBl)
   reportPosition();
 }
 
-void changeLengthRelative(float tA, float tB)
-{
-  changeLengthRelative((long) tA, (long)tB);
-}
-void changeLengthRelative(long tA, long tB)
-{
-  lastOperationTime = millis();
-  motorA.move(tA);
-  motorB.move(tB);
-  
-  while (motorA.distanceToGo() != 0 || motorB.distanceToGo() != 0)
-  {
-    //impl_runBackgroundProcesses();
-    if (currentlyRunning)
-    {
-      if (usingAcceleration)
-      {
-        motorA.run();
-        motorB.run();
-      }
-      else
-      {
-        motorA.runSpeedToPosition();
-        motorB.runSpeedToPosition();
-      }
-    }
-  }
-  
-  reportPosition();
-}
-
 long getMaxLength()
 {
   if (maxLength == 0)
@@ -197,20 +166,6 @@ void reportPosition()
   }
 }
 
-
-
-
-//void engageMotors()
-//{
-//  impl_engageMotors();
-//}
-//
-//void releaseMotors()
-//{
-//  impl_releaseMotors();
-//}
-//
-//
 float getCartesianXFP(float aPos, float bPos)
 {
   float calcX = (sq((float)pageWidth) - sq((float)bPos) + sq((float)aPos)) / ((float)pageWidth*2.0);
