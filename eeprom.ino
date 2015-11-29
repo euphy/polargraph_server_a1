@@ -40,7 +40,7 @@ void eeprom_loadMachineSize()
   EEPROM_readAnything(EEPROM_MACHINE_WIDTH, machineWidth);
   if (machineWidth < 1)
   {
-    machineWidth = defaultMachineWidth;
+    machineWidth = DEFAULT_MACHINE_WIDTH;
   }
   Serial.print(F("Loaded width:"));
   Serial.println(machineWidth);
@@ -48,7 +48,7 @@ void eeprom_loadMachineSize()
   EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, machineHeight);
   if (machineHeight < 1)
   {
-    machineHeight = defaultMachineHeight;
+    machineHeight = DEFAULT_MACHINE_HEIGHT;
   }
   Serial.print(F("Loaded height:"));
   Serial.println(machineHeight);
@@ -59,7 +59,7 @@ void eeprom_loadSpoolSpec()
   EEPROM_readAnything(EEPROM_MACHINE_MM_PER_REV, mmPerRev);
   if (mmPerRev < 1)
   {
-    mmPerRev = defaultMmPerRev;
+    mmPerRev = DEFAULT_MM_PER_REV;
   }
   Serial.print(F("Loaded mmPerRev:"));
   Serial.println(mmPerRev);
@@ -67,7 +67,7 @@ void eeprom_loadSpoolSpec()
   EEPROM_readAnything(EEPROM_MACHINE_STEPS_PER_REV, motorStepsPerRev);
   if (motorStepsPerRev < 1)
   {
-    motorStepsPerRev = defaultStepsPerRev;
+    motorStepsPerRev = DEFAULT_STEPS_PER_REV;
   }
   Serial.print(F("Loaded steps per rev:"));
   Serial.println(motorStepsPerRev);
@@ -76,7 +76,7 @@ void eeprom_loadSpoolSpec()
 void eeprom_loadPenLiftRange()
 {
   EEPROM_readAnything(EEPROM_PENLIFT_DOWN, downPosition);
-  if (downPosition < 0)
+  if ((downPosition < 0) || (downPosition > 360))
   {
     downPosition = DEFAULT_DOWN_POSITION;
   }
@@ -84,7 +84,7 @@ void eeprom_loadPenLiftRange()
   Serial.println(downPosition);
 
   EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
-  if (upPosition < 0)
+  if ((upPosition < 0) || (upPosition > 360))
   {
     upPosition = DEFAULT_UP_POSITION;
   }
@@ -97,7 +97,7 @@ void eeprom_loadStepMultiplier()
   EEPROM_readAnything(EEPROM_MACHINE_STEP_MULTIPLIER, stepMultiplier);
   if (stepMultiplier < 1)
   {
-    stepMultiplier = defaultStepMultiplier;
+    stepMultiplier = DEFAULT_STEP_MULTIPLIER;
   }
   Serial.print(F("Loaded step multiplier:"));
   Serial.println(stepMultiplier);  

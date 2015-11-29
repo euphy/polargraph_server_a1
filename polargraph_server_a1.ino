@@ -43,8 +43,8 @@ There are five config sections:
 
 // 2. Add some libraries if you have a MEGA
 // ========================================
-// Uncomment the SPI and SD lines below if you have a MEGA, and are going to use 
-// the SD features.  http://forum.arduino.cc/index.php?topic=173584.0
+// Uncomment the SPI and SD lines below if you have a MEGA.  
+// http://forum.arduino.cc/index.php?topic=173584.0
 //#include <SPI.h>
 //#include <SD.h>
 
@@ -106,7 +106,7 @@ There are five config sections:
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-const String FIRMWARE_VERSION_NO = "1.2";
+const String FIRMWARE_VERSION_NO = "1.2.1";
 
 //  EEPROM addresses
 const byte EEPROM_MACHINE_WIDTH = 0;
@@ -132,30 +132,32 @@ const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
 static int penLiftSpeed = 3; // ms between steps of moving motor
-byte const PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
+const byte PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
 boolean isPenUp = false;
 
-int motorStepsPerRev = 800;
-float mmPerRev = 95;
-byte stepMultiplier = 1;
+// Machine specification defaults
+const int DEFAULT_MACHINE_WIDTH = 650;
+const int DEFAULT_MACHINE_HEIGHT = 650;
+const int DEFAULT_MM_PER_REV = 95;
+const int DEFAULT_STEPS_PER_REV = 400;
+const int DEFAULT_STEP_MULTIPLIER = 1;
 
-static int machineWidth = 650;
-static int machineHeight = 800;
+// working machine specification
+static int motorStepsPerRev = DEFAULT_STEPS_PER_REV;
+static float mmPerRev = DEFAULT_MM_PER_REV;
+static byte stepMultiplier = DEFAULT_STEP_MULTIPLIER;
+static int machineWidth = DEFAULT_MACHINE_WIDTH;
+static int machineHeight = DEFAULT_MACHINE_HEIGHT;
 
-static int defaultMachineWidth = 650;
-static int defaultMachineHeight = 650;
-static int defaultMmPerRev = 95;
-static int defaultStepsPerRev = 800;
-static int defaultStepMultiplier = 1;
 
-float currentMaxSpeed = 800.0;
-float currentAcceleration = 400.0;
-boolean usingAcceleration = true;
+static float currentMaxSpeed = 800.0;
+static float currentAcceleration = 400.0;
+static boolean usingAcceleration = true;
 
 int startLengthMM = 800;
 
-float mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
-float stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
+float mmPerStep = 0.0F;
+float stepsPerMM = 0.0F;
 
 long pageWidth = machineWidth * stepsPerMM;
 long pageHeight = machineHeight * stepsPerMM;
@@ -181,9 +183,8 @@ static char inParam1[14];
 static char inParam2[14];
 static char inParam3[14];
 static char inParam4[14];
-//static char inParams[4][14];
 
-byte inNoOfParams;
+static byte inNoOfParams;
 
 char lastCommand[INLENGTH+1];
 boolean commandConfirmed = false;
@@ -230,14 +231,10 @@ const static char COMMA[] = ",";
 const static char CMD_END[] = ",END";
 const static String CMD_CHANGELENGTH = "C01";
 const static String CMD_CHANGEPENWIDTH = "C02";
-//const static String CMD_CHANGEMOTORSPEED = "C03";
-//const static String CMD_CHANGEMOTORACCEL = "C04";
 #ifdef PIXEL_DRAWING
 const static String CMD_DRAWPIXEL = "C05";
 const static String CMD_DRAWSCRIBBLEPIXEL = "C06";
-//const static String CMD_DRAWRECT = "C07";
 const static String CMD_CHANGEDRAWINGDIRECTION = "C08";
-//const static String CMD_TESTPATTERN = "C10";
 const static String CMD_TESTPENWIDTHSQUARE = "C11";
 #endif
 const static String CMD_SETPOSITION = "C09";
@@ -250,7 +247,6 @@ const static String CMD_SETPENLIFTRANGE = "C45";
 const static String CMD_CHANGELENGTHDIRECT = "C17";
 #endif
 const static String CMD_SETMACHINESIZE = "C24";
-//const static String CMD_SETMACHINENAME = "C25";
 const static String CMD_GETMACHINEDETAILS = "C26";
 const static String CMD_RESETEEPROM = "C27";
 const static String CMD_SETMACHINEMMPERREV = "C29";

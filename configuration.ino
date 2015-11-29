@@ -90,8 +90,8 @@ AccelStepper motorB(1,MOTOR_B_STEP_PIN, MOTOR_B_DIR_PIN);
 
 // motorStepsPerRev = 4076;
 // mmPerRev = 63;
-// defaultStepsPerRev = 4076;
-// defaultMmPerRev = 63;
+// DEFAULT_STEPS_PER_REV = 4076;
+// DEFAULT_MM_PER_REV = 63;
 
 AccelStepper motorA(8, 6,8,7,9);
 AccelStepper motorB(8, 2,4,3,5);
@@ -113,11 +113,9 @@ void configuration_motorSetup()
 
 void configuration_setup()
 {
-  defaultMachineWidth = 650;
-  defaultMachineHeight = 650;
-  defaultMmPerRev = 95;
-  defaultStepsPerRev = 400;
-  defaultStepMultiplier = 1;
+  mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
+  stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
+  
 #ifdef ADAFRUIT_MOTORSHIELD_V2
   AFMS.begin();  // create with the default frequency 1.6KHz
 #endif
