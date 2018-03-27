@@ -309,7 +309,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     float deltaY = c2y-c1y;
 //    float totalDistance = sqrt(sq(deltaX) + sq(deltaY));
 
-    int linesegs = 1;            // assume at least 1 line segment will get us there.
+    long linesegs = 1;            // assume at least 1 line segment will get us there.
     if (abs(deltaX) > abs(deltaY))
     {
       // slope <=1 case    
