@@ -4,6 +4,9 @@ polargraph_server_a1
 Polargraph Server for Arduino UNO and MEGA compatible boards using Adafruit motorshields,
 serial stepper drivers (eg Easy Drivers, stepsticks etc) or signal amplifiers (eg ULN2003s).
 
+This doesn't seem to compile in Arduino IDE v1.8.6! Why? I don't know! It works fine in 1.8.5. 
+It also doesn't work in the online web Arduino IDE. I'm on it.
+
 It is called *_a1* because it is the version for the first arduino (ie Uno, or Duemilanove).  
 Bit obtuse that, I know.
 
