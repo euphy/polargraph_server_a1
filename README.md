@@ -12,8 +12,8 @@ Bit obtuse that, I know.
 
 For convenience, I have pre-compiled and included two hex files:
 
-1. **polargraph_server_a1_adafruit_v1.cpp.hex** - Is for motorshield v1.
-2. **polargraph_server_a1_adafruit_v2.cpp.hex** - Is for the new motorshield v2.
+1. **polargraph_server_a1_adafruit_v1.cpp.hex** - Is for Adafruit motorshield v1 looks like this: https://www.adafruit.com/product/81.
+2. **polargraph_server_a1_adafruit_v2.cpp.hex** - Is for the Adafruit motorshield v2 looks like this: https://www.adafruit.com/product/1438.
 
 Motor driver:
 -------------
@@ -34,8 +34,8 @@ There are five config sections:
 1. Specify what kind of controller board you are using
 2. Add some libraries if you have a MEGA
 3. Specify what kind of motor driver you are using:
-  1. Adafruit Motorshield v1
-  2. Adafruit Motorshield v2
+  1. Adafruit Motorshield v1 (https://www.adafruit.com/product/81)
+  2. Adafruit Motorshield v2 (https://www.adafruit.com/product/1438)
   3. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
   4. Signal amplifier like a UNL2003*
 4.  Turn on some debugging code
