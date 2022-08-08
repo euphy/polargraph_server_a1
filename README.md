@@ -1,6 +1,5 @@
 update for 28YBJ-48 Stepper
 
-====================
 polargraph_server_a1
 ====================
 
