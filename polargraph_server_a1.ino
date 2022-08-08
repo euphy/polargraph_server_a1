@@ -55,8 +55,8 @@ There are five config sections:
 
 //   i. Adafruit Motorshield v1. The original, and still the best.
 //   -------------------------------------------------------------
-#define ADAFRUIT_MOTORSHIELD_V1
-#include <AFMotor.h>
+//#define ADAFRUIT_MOTORSHIELD_V1
+//#include <AFMotor.h>
 
 //   ii. Adafruit Motorshield v2. It's all squealy.
 //   ----------------------------------------------
@@ -73,7 +73,7 @@ There are five config sections:
 //   iv. Using a signal amplifier like a UNL2003? 
 //   --------------------------------------------
 //   Don't forget to define your pins in 'configuration.ino'.
-//   #define UNL2003_DRIVER
+#define UNL2003_DRIVER
 
 
 // 4.  Turn on some debugging code if you want horror
@@ -132,14 +132,14 @@ const int DEFAULT_UP_POSITION = 180;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
 static int penLiftSpeed = 3; // ms between steps of moving motor
-const byte PEN_HEIGHT_SERVO_PIN = 9; //UNL2003 driver uses pin 9
+const byte PEN_HEIGHT_SERVO_PIN = 11;//9; //UNL2003 driver uses pin 9
 boolean isPenUp = false;
 
 // Machine specification defaults
-const int DEFAULT_MACHINE_WIDTH = 650;
-const int DEFAULT_MACHINE_HEIGHT = 650;
-const int DEFAULT_MM_PER_REV = 95;
-const int DEFAULT_STEPS_PER_REV = 400;
+const int DEFAULT_MACHINE_WIDTH = 490;//650;
+const int DEFAULT_MACHINE_HEIGHT = 450;//650;
+const int DEFAULT_MM_PER_REV = 32;//95;
+const int DEFAULT_STEPS_PER_REV = 4076;//2038; //400;
 const int DEFAULT_STEP_MULTIPLIER = 1;
 
 // working machine specification
@@ -150,11 +150,11 @@ static int machineWidth = DEFAULT_MACHINE_WIDTH;
 static int machineHeight = DEFAULT_MACHINE_HEIGHT;
 
 
-static float currentMaxSpeed = 800.0;
-static float currentAcceleration = 400.0;
+static float currentMaxSpeed = 1500.0;
+static float currentAcceleration = 600.0;
 static boolean usingAcceleration = true;
 
-int startLengthMM = 800;
+int startLengthMM = 300;//800;
 
 float mmPerStep = 0.0F;
 float stepsPerMM = 0.0F;
@@ -388,5 +388,3 @@ static float scaleY = 1.0;
 static int rotateTransform = 0;
 
 #endif
-
-
